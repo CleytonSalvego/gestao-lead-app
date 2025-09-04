@@ -1,0 +1,31 @@
+{
+    "estados": [
+        {"codigo":"11", "descricao": "Rondônia"},
+        {"codigo":"12", "descricao": "Acre"},
+        {"codigo":"13", "descricao": "Amazonas"},
+        {"codigo":"14", "descricao": "Roraima"},
+        {"codigo":"15", "descricao": "Pará"},
+        {"codigo":"16", "descricao": "Amapá"},
+        {"codigo":"17", "descricao": "Tocantins"},
+        {"codigo":"21", "descricao": "Maranhão"},
+        {"codigo":"22", "descricao": "Piauí"},
+        {"codigo":"23", "descricao": "Ceará"},
+        {"codigo":"24", "descricao": "Rio Grande do Norte"},
+        {"codigo":"25", "descricao": "Paraíba"},
+        {"codigo":"26", "descricao": "Pernambuco"},
+        {"codigo":"27", "descricao": "Alagoas"},
+        {"codigo":"28", "descricao": "Sergipe"},
+        {"codigo":"29", "descricao": "Bahia"},
+        {"codigo":"31", "descricao": "Minas Gerais"},
+        {"codigo":"32", "descricao": "Espírito Santo"},
+        {"codigo":"33", "descricao": "Rio de Janeiro"},
+        {"codigo":"35", "descricao": "São Paulo"},
+        {"codigo":"41", "descricao": "Paraná"},
+        {"codigo":"42", "descricao": "Santa Catarina"},
+        {"codigo":"43", "descricao": "Rio Grande do Sul"},
+        {"codigo":"50", "descricao": "Mato Grosso do Sul"},
+        {"codigo":"51", "descricao": "Mato Grosso"},
+        {"codigo":"52", "descricao": "Goiás"},
+        {"codigo":"53", "descricao": "Distrito Federal"}
+    ]
+}

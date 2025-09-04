@@ -1,0 +1,193 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Nova Ordem de Serviço</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="loader">
+  <app-loader-modal [mensagem]="'Aguarde...'"></app-loader-modal>
+</ion-content>
+
+<ion-content [fullscreen]="true" *ngIf="!loader">
+  <ion-grid class="grid-top">
+
+    <ion-item lines="none" class="text-input">
+        <div class="datetime-popover">
+          <ion-row>
+            <ion-col size="10">
+              <ion-input class="input-form-text" value="{{ date | date: 'dd/MM/yyyy' }}" id="date"></ion-input>
+              <ion-popover #popoverDate size="cover" trigger="date" show-backdrop="false" [dismissOnSelect]="false">
+                <ng-template>
+                  <ion-datetime 
+                    #popoverDatetime 
+                    presentation="date" 
+                    [(ngModel)]="date" 
+                    locale="pt-BR"
+                    (ionChange)="pickDateModelChange()">
+                  </ion-datetime>
+                  <ion-buttons slot="buttons">
+                    <ion-button class="ion-text-center box-footer text-footer" (click)="fecharPickerDate()">Selecionar</ion-button>
+                  </ion-buttons>
+                </ng-template>
+              </ion-popover>
+            </ion-col>
+            <ion-col size="2" class="datetime-popover-icone">
+              <ion-icon  ios="calendar-clear-outline" md="calendar-clear-outline"></ion-icon>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <div class="error-form" *ngIf="!validPrazoExecucao">
+              A data não pode ser menor que a atual.
+            </div>
+          </ion-row>
+        </div>
+        
+    </ion-item>
+
+    <ion-item lines="none" class="text-input">
+      <div class="datetime-popover">
+        <ion-row>
+          <ion-col size="10">
+            <ion-input class="input-form-text" value="{{hora}}" id="time"></ion-input>
+            <ion-popover #popoverHora size="cover" trigger="time" show-backdrop="false" [dismissOnSelect]="false">
+              <ng-template>
+                <ion-datetime 
+                  #popoverHoraDatetime
+                  presentation="time" 
+                  [(ngModel)]="time" 
+                  locale="pt-BR"
+                  hourCycle="h24"
+                  (ionChange)="pickTimeModelChange()">
+                </ion-datetime>
+                <ion-buttons slot="buttons">
+                    <ion-button class="ion-text-center box-footer text-footer" (click)="fecharPickerHora()">Selecionar</ion-button>
+                  </ion-buttons>
+              </ng-template>
+            </ion-popover>
+          </ion-col>
+          <ion-col size="2" class="datetime-popover-icone">
+            <ion-icon  ios="time-outline" md="time-outline"></ion-icon>
+          </ion-col>
+        </ion-row>
+      </div>
+      
+  </ion-item>
+
+   
+   
+
+    <ion-list>
+      <ion-item lines="none">
+          <ion-select 
+            label="Empresa" 
+            label-placement="fixed" 
+            [(ngModel)]="empresa"
+            justify="space-between" 
+            fill="outline" 
+            okText="Selecionar" 
+            cancelText="Cancelar"
+            (ionChange)="empresaSelected($event)">
+            <ion-select-option  [value]="-1">Nenhum valor</ion-select-option >
+            <ion-select-option *ngFor="let item of listEmpresa" [value]="item.id" >{{item.descricao}}</ion-select-option >
+          </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-item lines="none">
+          <ion-select 
+            label="Técnico 1" 
+            label-placement="fixed" 
+            [(ngModel)]="tecnico"
+            justify="space-between" 
+            fill="outline" 
+            okText="Selecionar" 
+            cancelText="Cancelar"
+            (ionChange)="tecnicoSelected($event)">
+            <ion-select-option  [value]="-1">Nenhum valor</ion-select-option >
+            <ion-select-option *ngFor="let item of listTecnico" [value]="item.id" >{{item.descricao}}</ion-select-option >
+          </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-item lines="none">
+          <ion-select 
+            label="Técnico 2" 
+            label-placement="fixed" 
+            [(ngModel)]="acompanhante"
+            justify="space-between" 
+            fill="outline" 
+            okText="Selecionar" 
+            cancelText="Cancelar"
+            (ionChange)="acompanhanteSelected($event)">
+            <ion-select-option  [value]="-1">Nenhum valor</ion-select-option >
+            <ion-select-option *ngFor="let item of listTecnico" [value]="item.id" >{{item.descricao}}</ion-select-option >
+          </ion-select>
+      </ion-item>
+    </ion-list>
+
+
+    <!-- <ion-item lines="none" class="text-input" (click)="selectEmpresa.open(); showModal()" [ngClass]="listEmpresa.length == 0 ? 'combo-invalido' : ''"> 
+      <div class="input-select-modal">
+        <ion-label *ngIf="empresa == -1" class="text-input-select">Empresa</ion-label>
+        <app-searchable-select 
+          title="Empresa"  
+          [data]="listEmpresa"
+          itemTextField="descricao"
+          [value]="empresa"
+          [isAndroid]="isAndroid"
+          #selectEmpresa
+          (selectedChanged)="empresaSelected($event)">>
+        </app-searchable-select>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none" class="text-input" (click)="selectTecnico.open(); showModal()" [ngClass]="listTecnico.length == 0 ? 'combo-invalido' : ''"> 
+      <div class="input-select-modal">
+        <ion-label *ngIf="tecnico == -1" class="text-input-select">Técnico</ion-label>
+        <app-searchable-select 
+          title="Técnicos"  
+          [data]="listTecnico"
+          itemTextField="descricao"
+          [value]="tecnico"
+          [isAndroid]="isAndroid"
+          #selectTecnico
+          (selectedChanged)="tecnicoSelected($event)">>
+        </app-searchable-select>
+      </div>
+    </ion-item> -->
+
+    <ion-item lines="none" class="text-input">
+      <ion-textarea (ionInput)="validateForm()" [(ngModel)]="local" fill="outline" label="Local" labelPlacement="floating" auto-grow="true"></ion-textarea>
+    </ion-item>
+  </ion-grid>
+
+ 
+ 
+</ion-content>
+
+<ion-footer *ngIf="!loader">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer" (click)="salvar()">
+          <ion-buttons>
+            <ion-button >
+              Salvar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

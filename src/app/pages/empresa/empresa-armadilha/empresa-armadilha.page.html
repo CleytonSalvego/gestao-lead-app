@@ -1,0 +1,157 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Selecionar Armadilha</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid class="grid-top">
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          (ionChange)="gerarQRCode()"
+          label="Descrição" 
+          [(ngModel)]="descricao"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Descrição">
+        </ion-input>
+      </div>
+    </ion-item>
+
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          (ionChange)="gerarQRCode()"
+          label="N° Armadilha" 
+          [(ngModel)]="numeroOrdem"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="N° Ordem"
+          type="number"
+          step="1.0">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+        (ionChange)="gerarQRCode()" 
+          label="N° Grupo" 
+          [(ngModel)]="numeroOrdemGrupo"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="N° Ordem Grupo"
+          type="number"
+          step="1.0">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="feromonio"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="end"
+          (ionChange)="selectArmadilha('feromonio')">Feromônio
+          
+        </ion-toggle>
+      </div>
+    </ion-item>
+    
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="luminosa"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="end"
+          (ionChange)="selectArmadilha('luminosa')">Luminosa
+        </ion-toggle>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="pontoIscaPermanente"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="end"
+          (ionChange)="selectArmadilha('pontoIscaPermanente')">Ponto Isca Permanente
+        </ion-toggle>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="tunel"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="end"
+          (ionChange)="selectArmadilha('tunel')">Túnel
+        </ion-toggle>
+      </div>
+    </ion-item>
+
+    <!-- <ion-item lines="none">
+      <qrcode
+        #parent
+        (click)="downloadQRCode(parent)"
+        [qrdata]="qrCode"
+        [allowEmptyString]="true"
+        [ariaLabel]="'QR Code'"
+        [cssClass]="'center'"
+        [colorDark]="'#000000ff'"
+        [colorLight]="'#ffffffff'"
+        [elementType]="'canvas'"
+        [errorCorrectionLevel]="'M'"
+        [imageHeight]="75"
+        [imageWidth]="75"
+        [margin]="4"
+        [scale]="1"
+        [title]="'QR Code'"
+        [width]="300"
+      ></qrcode>
+    </ion-item> -->
+    
+  </ion-grid>
+
+ 
+ 
+</ion-content>
+
+<ion-footer >
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer">
+          <ion-buttons>
+            <ion-button (click)="salvar()">
+              Selecionar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

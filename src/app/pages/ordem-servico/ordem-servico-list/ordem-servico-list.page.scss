@@ -1,0 +1,113 @@
+app-item-list {
+    width: 100% !important;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+ion-buttons {
+    display: block;
+}
+
+.box-footer {
+    display: flex;
+    width: 100%;
+    height: 58.5px;
+    padding: 10px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--gray-200, #EAECF0);
+    background: var(--ion-color-primary);
+}
+
+.box-footer-focus {
+  display: flex;
+  width: 100%;
+  height: 58.5px;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--gray-200, #EAECF0);
+  background: #496A05;
+}
+
+.text-footer {
+    color: white;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+.icon-footer {
+    width: 23px;
+    height: 23px;
+}
+
+.scanner-buttons {
+    margin: 0px;
+    position: absolute;
+    bottom: 100px;
+    width: 100vw;
+    height: 50px;
+    z-index: 11;
+}
+
+.scan-box {
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 100vmax rgba(255, 255, 255, 0.3);
+  opacity: 0.3;
+  content: '';
+  display: block;
+  left: 50%;
+  height: 300px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+}
+
+
+.ion-badge-filter {
+    --background: none !important;
+    --color: #818386;
+    --padding-end: 10px;
+    --padding-start: 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  
+  .format-badge {
+    display: inline-flex;
+    align-items: flex-start;
+    mix-blend-mode: multiply;
+    flex-wrap: wrap;
+    margin-left: 2px;
+  }
+  
+  .container-filter {
+    min-height: min-content;
+    display: inline-block;
+  
+  }
+  
+  .container-badge {
+    margin-top: 6%;
+  }
+  
+  .div-bagde {
+    display: inline;
+  }
+  
+  .ion-list-badge {
+    padding: 0px;
+    margin: 0px;
+  }
+
+  .grid-top{
+    margin-top:50px !important;
+  }

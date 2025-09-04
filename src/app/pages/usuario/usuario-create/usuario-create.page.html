@@ -1,0 +1,116 @@
+<ion-backdrop *ngIf="showBackDrop"></ion-backdrop>
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Novo Usuário</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="loader">
+  <app-loader-modal [mensagem]="'Aguarde...'"></app-loader-modal>
+</ion-content>
+
+<ion-content [fullscreen]="true" *ngIf="!loader">
+  <ion-grid class="grid-top">
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="numero"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Número">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="nome"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Nome">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none" *ngIf="!editar">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="senha"
+          class="input-form-text"
+          fill="outline" 
+          type="password"
+          placeholder="Senha">
+        </ion-input>
+      </div>
+    </ion-item>
+   
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="tecnico"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="start"
+          (ionChange)="selectTecnicoAdmin('tecnico', $event)">Técnico
+        </ion-toggle>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="admin"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="start"
+          (ionChange)="selectTecnicoAdmin('admin', $event)">Admin
+        </ion-toggle>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="ativo"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="start">Ativo
+        </ion-toggle>
+      </div>
+    </ion-item>
+    
+  </ion-grid>
+
+ 
+ 
+</ion-content>
+
+<ion-footer *ngIf="!loader">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer">
+          <ion-buttons>
+            <ion-button (click)="salvar()">
+              Salvar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

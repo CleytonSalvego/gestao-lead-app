@@ -1,0 +1,7 @@
+{
+  "name": "Higienex",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

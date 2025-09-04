@@ -1,0 +1,91 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Armadilha {{item.ordem}} - {{item.descricao}}</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="loader">
+  <app-loader-modal [mensagem]="'Aguarde...'"></app-loader-modal>
+</ion-content>
+
+<ion-content [fullscreen]="true" *ngIf="!loader">
+  <ion-grid class="grid-top">
+
+    <ion-list>
+      <ion-item lines="none">
+          <ion-select 
+            [multiple]="true"
+            label="Status" 
+            label-placement="fixed" 
+            [(ngModel)]="statusArmadilha"
+            justify="space-between" 
+            fill="outline" 
+            okText="Selecionar" 
+            cancelText="Cancelar"
+            (ionChange)="statusArmadilhaSelected($event)">
+            <ion-select-option  [value]="">Nenhum valor</ion-select-option >
+            <ion-select-option *ngFor="let item of listStatusArmadilhaPIP" [value]="item.codigo" >{{item.descricao}}</ion-select-option >
+          </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="quantidadeInsetoscapturados"
+          class="input-form-text"
+          fill="outline" 
+          label="Qtde. Insetos Capturados"
+          labelPlacement="floating" 
+          placeholder=""
+          type="number"
+          step="1.0">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none" class="text-input">
+      <ion-textarea [(ngModel)]="ocorrencia" fill="outline" label="Ocorrência" labelPlacement="floating" auto-grow="true"></ion-textarea>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input div-icon-center">
+          <ion-icon aria-hidden="true" name="image-outline" slot="end" color="primary" (click)="getPhotoGallery()"></ion-icon >
+      </div>
+    </ion-item>
+
+    <ion-item lines="none" *ngIf="base64 != null && base64 != ''">
+      <div>
+        <ion-img [src]="imagemBase64" class="img-photo box-imagem" ></ion-img>
+      </div>
+    </ion-item>
+  </ion-grid>
+
+ 
+ 
+</ion-content>
+
+<ion-footer *ngIf="statusOrdemServico != 3 && status != 'OK' && !loader">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer" (click)="salvar()">
+          <ion-buttons>
+            <ion-button >
+              Salvar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

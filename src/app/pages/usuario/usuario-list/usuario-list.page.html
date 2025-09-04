@@ -1,0 +1,64 @@
+<ion-backdrop *ngIf="showBackDrop"></ion-backdrop>
+
+<ion-content [fullscreen]="true"  >
+
+  <ion-grid class="grid-margin">
+    <app-skeleton-list *ngIf="!loaded"></app-skeleton-list>
+  </ion-grid>
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="circles"
+      refreshingText="Carregando...">
+    </ion-refresher-content>
+  </ion-refresher>
+  
+  <ion-header class="toolbar-search" *ngIf="loaded">
+    <ion-toolbar collapse="condense" class="header-fixed " >
+      <ion-row>
+        <ion-col size="12">
+          <app-search-item (ionInput)="handleInput($event)" [placeHolder]="'Buscar por nome'"></app-search-item>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-grid class="grid-top" *ngIf="loaded">
+    <ion-list *ngIf="results.length > 0">
+      <ion-item-sliding *ngFor="let item of results">
+        <ion-item lines="full" style="cursor:pointer" >
+          <app-item-list 
+            [nome]="item.name" 
+            [data_cadastro]="item.created_at" 
+            [tecnico]="item.tecnico"
+            [admin]="item.admin"
+            [ativo]="item.ativo"
+            (click)="editar(item)">
+        </app-item-list>
+      </ion-item>
+      <ion-item-options side="end">
+          <ion-item-option *ngIf="!item.ativo" class="ion-item-options-success" (click)="ativar(item.id)">Ativar</ion-item-option>
+          <ion-item-option *ngIf="item.ativo" class="ion-item-options-danger" (click)="desativar(item.id)">Desativar</ion-item-option>
+          <ion-item-option class="ion-item-options-danger" (click)="remover(item.id)">Remover</ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+     
+    </ion-list>
+  </ion-grid>
+  
+</ion-content>
+
+<ion-footer >
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer">
+          <ion-buttons>
+            <ion-button (click)="showCreate()">
+              Novo
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

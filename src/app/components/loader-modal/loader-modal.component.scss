@@ -1,0 +1,21 @@
+.loader {
+    margin-top: 50%;
+}
+
+ion-spinner {
+    width: 52px;
+    height: 52px;
+    color: var(--ion-color-primary);
+}
+
+
+ion-content {
+    height: 100%;
+}
+
+.text-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+

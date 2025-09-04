@@ -1,0 +1,40 @@
+<ion-content [fullscreen]="true">
+  <div>
+    <img src="../../../assets/logo-main.png" class="logo">
+    <div class="text-fomated">
+      Apontamento de Ordem de Serviço
+    </div>
+  </div>
+
+  <form [formGroup]="formGroup">
+    <div class="login-form">
+      <div class="input-form ">
+        <ion-input 
+          formControlName="formEmail"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Usuário">
+          
+        </ion-input>
+        <ion-icon *ngIf="this.formGroup.controls?.['formEmail']?.touched && this.formGroup.controls?.['formEmail']?.invalid" name="alert-circle-outline" class="icon-input"></ion-icon>
+      </div>
+      <div class="input-form ">
+        <ion-input 
+        formControlName="formSenha"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Senha"
+          type="password">
+        </ion-input>
+        <ion-icon *ngIf="this.formGroup.controls?.['formSenha']?.touched && this.formGroup.controls?.['formSenha']?.invalid" name="alert-circle-outline" class="icon-input"></ion-icon>
+      </div>
+      <div>
+        <ion-button expand="block" size="large" [ngClass]="formGroup.invalid ? 'btn-login-invalid' : 'btn-login-valid'" (click)="login()">Entrar</ion-button>
+      </div>
+      <!-- <div class="text-password" >
+        Esqueceu a senha?
+      </div> -->
+
+    </div>
+  </form>
+</ion-content>

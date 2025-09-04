@@ -1,0 +1,154 @@
+.hidden-icon {
+    visibility: hidden;
+}
+
+
+div {
+    font-size: 12px !important;
+    padding: 0px;
+}
+
+.text {
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+
+}
+
+.text-title {
+    color: var(--ion-text-color, #000);
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px;
+    margin-bottom: 4px;
+}
+
+.text-bold {
+    color: var(--ion-text-color, #000);
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 18px;
+    /* 150% */
+}
+
+.text-red{
+    color: red;
+}
+
+.text-normal {
+    color: var(--ion-text-color, #000);
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+.text-description {
+    //white-space: nowrap;
+    margin-bottom: 6px;
+}
+
+.status-text {
+    text-align: center;
+    font-family: Inter;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    /* 180% */
+}
+
+.box-status {
+    width: 100%;
+    display: flex;
+    padding: 0px 0px 0px 0px;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    border-radius: 16px;
+    font-size: 10px !important;
+}
+
+.status-line {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-apontamento {
+    display: flex;
+    width: 100% !important;
+    height: 58px;
+    padding: 10px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--gray-200, #EAECF0);
+    background: var(--primary-700, #175CD3);
+    color: white;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+.button-message {
+    display: flex;
+    width: 100% !important;
+    height: 58px;
+    padding: 10px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--gray-200, #EAECF0);
+    background: #EAECF0;
+    color: red;
+    font-size: 14px;
+    font-style: bold;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+
+.download-valid {
+    color: #175CD3;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px;
+    cursor: pointer;
+    /* 150% */
+}
+
+.download-invalid {
+    color: #98A2B3;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px;
+    /* 150% */
+}
+
+.box-qrcode{
+    width: 100% !important;
+}
+
+.qrcode{
+    height: 256px;
+    width: 256px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

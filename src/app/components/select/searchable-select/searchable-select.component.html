@@ -1,0 +1,76 @@
+<div  *ngIf="data.length && selected.length && value != '' && value != -1; else placeholder" >
+  <!-- <span *ngFor="let item of selected">{{leaf(item)}}</span> -->
+  <div id="modalSearchValue" *ngFor="let item of selected" class="select-wrapper label-text-wrapper">{{leaf(item)}}</div>
+</div>
+
+<ng-template #placeholder >
+{{selected}}
+</ng-template>
+
+<ion-modal id="search-select-modal" [isOpen]="isOpen" *ngIf="existData" [showBackdrop]="true" [backdropDismiss]="false" [swipeToClose]="false">
+  <ng-template>
+    <ion-content >
+      <ion-header class="toolbar-search ">
+        <ion-toolbar collapse="condense" class="header-fixed ">
+          <ion-row>
+            <ion-item lines="none" class="text-header-center">
+              <div >{{title}}</div>
+            </ion-item>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <app-search-item 
+                (ionInput)="filter($event)"
+                [placeHolder]="'Buscar por nome'">
+              </app-search-item>
+            </ion-col>
+          </ion-row>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-list id="lista" [ngClass]="isAndroid ? 'lista' : 'lista-ios'">
+        <ion-item lines="none" *ngIf="!searching">
+          <ion-label (click)="itemSelected(null)">Nenhum valor</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-label (click)="itemSelected('')">Nenhum valor</ion-label>
+        </ion-item>
+        <ion-item lines="none"  *ngFor="let item of filtered; let index">
+          <ion-label (click)="itemSelected(item)">{{item.descricao}}</ion-label>
+        </ion-item>
+      </ion-list>
+      <ion-infinite-scroll (ionInfinite)="loadInfiniteScroll($event)">
+        <ion-infinite-scroll-content 
+          loadingText="carregando..." 
+          loadingSpinner="bubbles">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    
+    </ion-content>
+    <ion-footer class="ion-no-border" collapse="fade" >
+      <div class="ion-text-center" >
+        <ion-button expand="block" size="default" class="btn-limpar-filtro-valid"  (click)="cancel()">Fechar</ion-button>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
+
+<ion-modal id="search-select-modal" [isOpen]="isOpen" *ngIf="!existData"  [backdropDismiss]="false" [swipeToClose]="false">
+  <ng-template>
+    <ion-content >
+      <div class="center">
+        <div class="ion-text-center">
+          <ion-icon size="large" ios="alert-outline" md="alert-outline"  class="logo"></ion-icon>
+        </div>
+        <div  class="ion-text-center text-header">Não há dados</div>
+      </div>
+    </ion-content>
+    <ion-footer class="ion-no-border" collapse="fade" >
+      <div class="ion-text-center" >
+        <ion-button expand="block" size="default" class="btn-limpar-filtro-valid"  (click)="cancel()">Fechar</ion-button>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
+
+

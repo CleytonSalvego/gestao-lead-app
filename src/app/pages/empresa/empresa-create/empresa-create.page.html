@@ -1,0 +1,340 @@
+<ion-backdrop *ngIf="showBackDrop"></ion-backdrop>
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Nova Empresa</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="loader">
+  <app-loader-modal [mensagem]="'Aguarde...'"></app-loader-modal>
+</ion-content>
+
+<ion-content [fullscreen]="true" *ngIf="!loader" >
+  <ion-grid class="grid-top" >
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="cnpj"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="CNPJ">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="razaoSocial"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Razão Social">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="telefone"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Telefone">
+        </ion-input>
+      </div>
+    </ion-item>
+  
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="email"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="E-mail">
+        </ion-input>
+      </div>
+    </ion-item>
+  
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="responsavel"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Responsável">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="logradouro"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Logradouro">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="numero"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Número">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="bairro"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Bairro">
+        </ion-input>
+      </div>
+    </ion-item>
+
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="complemento"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Complemento">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-list>
+      <ion-item lines="none">
+          <ion-select 
+            label="Estados" 
+            label-placement="fixed" 
+            [(ngModel)]="estado"
+            justify="space-between" 
+            fill="outline" 
+            okText="Selecionar" 
+            cancelText="Cancelar"
+            (ionChange)="estadoSelected($event)">
+            <ion-select-option  [value]="-1">Nenhum valor</ion-select-option >
+            <ion-select-option *ngFor="let item of listEstado" [value]="item.codigo" >{{item.descricao}}</ion-select-option >
+          </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-item lines="none">
+          <ion-select 
+            label="Cidades" 
+            label-placement="fixed" 
+            [(ngModel)]="cidade"
+            justify="space-between" 
+            fill="outline" 
+            okText="Selecionar" 
+            cancelText="Cancelar"
+            (ionChange)="cidadeSelected($event)">
+            <ion-select-option  [value]="-1">Nenhum valor</ion-select-option >
+            <ion-select-option *ngFor="let item of listCidade" [value]="item.codigo" >{{item.descricao}}</ion-select-option >
+          </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <!-- <ion-item lines="none" class="text-input" (click)="selectEstado.open(); showModal()" [ngClass]="listEstado.length == 0 ? 'combo-invalido' : ''"> 
+      <div class="input-select-modal">
+        <ion-label *ngIf="estado == -1" class="text-input-select">Estados</ion-label>
+        <app-searchable-select 
+          title="Estados"  
+          [data]="listEstado"
+          itemTextField="descricao"
+          [value]="estado"
+          [isAndroid]="isAndroid"
+          #selectEstado
+          (selectedChanged)="estadoSelected($event)">>
+        </app-searchable-select>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none" class="text-input" (click)="selectCidade.open(); showModal()" [ngClass]="listCidade.length == 0 ? 'combo-invalido' : ''"> 
+      <div class="input-select-modal">
+        <ion-label *ngIf="cidade == -1" class="text-input-select">Cidades</ion-label>
+        <app-searchable-select 
+          title="Cidades"  
+          [data]="listCidade"
+          itemTextField="descricao"
+          [value]="cidade"
+          [isAndroid]="isAndroid"
+          #selectCidade
+          (selectedChanged)="cidadeSelected($event)">>
+        </app-searchable-select>
+      </div>
+    </ion-item> -->
+
+    <ion-item lines="none">
+      <div class="toogle-input">
+        <ion-toggle 
+          [(ngModel)]="ativo"
+          class="input-form-text toggle-wrapper label-text-wrapper"
+          [enableOnOffLabels]="true" 
+          justify="start" 
+          labelPlacement="start">Ativo
+        </ion-toggle>
+      </div>
+    </ion-item>
+
+
+</ion-grid>
+
+<ion-grid class="grid-top" >
+  <ion-row>
+
+    <ion-col class="12" *ngIf="loaderArmadilha">
+      <ion-item lines="none" class="format-input-caputura"><strong>Armadilhas</strong></ion-item>
+      <ion-item lines="none">
+        <ion-spinner name="dots"></ion-spinner>
+      </ion-item>
+    </ion-col>
+    <ion-col class="12" *ngIf="!loaderArmadilha">
+      <div class="ion-text-center box-footer text-footer" (click)="showArmadilha()">
+        <ion-buttons>
+          <ion-icon class="icon-button" name="add-circle-outline"></ion-icon>
+          <ion-button >
+            Armadilha
+          </ion-button>
+        </ion-buttons>
+      </div>
+    </ion-col>
+  </ion-row>
+
+  <ion-row *ngIf="listArmadilha.length != undefined &&  listArmadilha.length > 0 && showArmadilhas == true && !loaderArmadilha">
+    <ion-card  *ngFor="let item of listArmadilha" class="card-armadilha">
+      <ion-card-header *ngIf="item.armadilhas.length > 0">
+        <ion-card-subtitle><strong>{{item.ordem}} - {{item.descricao}}</strong></ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        
+        <ion-list *ngIf="item.armadilhas.length > 0">
+          <ion-grid class="grid-top">
+            <ion-row>
+              <ion-col size="2">
+                <ion-item lines="none" class="card-armadilha-item">
+                  N°
+                </ion-item>
+              </ion-col>
+              <ion-col size="10">
+                <ion-item lines="none" class="card-armadilha-item">
+                  Armadilha
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row *ngFor="let armadilha of item.armadilhas">
+              <ion-col size="2">
+                <ion-item lines="full" class="card-armadilha-item">
+                  {{armadilha.ordem}}
+                </ion-item>
+              </ion-col>
+              <ion-col size="10">
+                <ion-item lines="full" class="card-armadilha-item">
+                  {{armadilha.descricao}}
+                  <ion-icon aria-hidden="true" name="trash-outline" slot="end" color="danger" (click)="removeArmadilha(armadilha)"></ion-icon >
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <!-- <ion-item lines="full" class="card-armadilha-item" >
+            <ion-icon aria-hidden="true" name="trash-outline" slot="end" color="danger" (click)="removeArmadilha(armadilha)"></ion-icon >
+             
+          </ion-item> -->
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </ion-row>
+
+</ion-grid>
+
+<ion-grid class="grid-top" >
+  <ion-row>
+    <ion-col class="12" *ngIf="loaderMapa">
+      <ion-item lines="none" class="format-input-caputura"><strong>Mapas</strong></ion-item>
+      <ion-item lines="none">
+        <ion-spinner name="dots"></ion-spinner>
+      </ion-item>
+    </ion-col>
+    <ion-col class="12" *ngIf="!loaderMapa">
+      <div class="ion-text-center box-footer text-footer" (click)="showMapa()">
+        <ion-buttons>
+          <ion-icon class="icon-button" name="add-circle-outline"></ion-icon>
+          <ion-button >
+            Mapa
+          </ion-button>
+        </ion-buttons>
+      </div>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-list *ngIf="listMapa.length != undefined && listMapa.length > 0 && !loaderMapa">
+        <ion-item lines="full" class="card-armadilha-item" style="cursor:pointer" *ngFor="let item of listMapa">
+          <ion-icon aria-hidden="true" name="eye-outline" slot="end" (click)="setOpen(item, true)"></ion-icon >
+          <ion-icon aria-hidden="true" name="trash-outline" slot="end" color="danger" (click)="removeMapa(item)"></ion-icon >
+        {{item.ordem}} - {{item.descricao}}
+      </ion-item>
+    </ion-list>
+  </ion-row>
+
+</ion-grid>
+ 
+</ion-content>
+
+<ion-content class="ion-padding" *ngIf="isModalOpen">
+  <ion-modal [isOpen]="isModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ModalTitle}}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen('',false)">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-img *ngIf="tipoArquivo == 'jpeg'"  [src]="imageSrc" class="fullscreen-image" ></ion-img>
+        <div *ngIf="tipoArquivo == 'pdf'" class="pdf-container" style="height: 100%;">
+          <iframe [src]="imageSrc"  style="width:100%; height: inherit !important" frameborder="0"></iframe>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+
+<ion-footer *ngIf="!loader" >
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer" (click)="salvar()">
+          <ion-buttons>
+            <ion-button >
+              Salvar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

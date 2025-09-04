@@ -1,0 +1,18 @@
+<ion-row>
+  <div class="text-description text-bold">{{codigo}} - Empresa: {{empresa | titlecase}}</div>
+</ion-row>
+<ion-row>
+  <div class="text-description text-bold">Status: <span class="text-normal" [ngClass]="setStatus(status)"> {{status | titlecase}} </span></div>
+</ion-row>
+<ion-row>
+  <div class="text-description text-bold">Data: <span class="text-normal"> {{data}} </span> </div>
+</ion-row>
+<ion-row>
+  <div class="text-description text-bold">Hora: <span class="text-normal"> {{hora}} </span> </div>
+</ion-row>
+<ion-row>
+  <div class="text-description text-bold">Técnico: <span class="text-normal"> {{tecnico | titlecase}} </span></div>
+</ion-row>
+<ion-row>
+  <div class="text-description text-bold">Local: <span class="text-normal"> {{local | titlecase}} </span></div>
+</ion-row>

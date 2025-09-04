@@ -1,0 +1,69 @@
+<ion-menu contentId="main-content" class="menu-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title class="title-menu">
+        <div class="header-menu">
+          <div (click)="goToHome()" [ngClass]="isAndroid ? 'logo-header-android' : 'logo-header-ios'">
+            <img src="../../../assets/logo-main.png" [ngClass]="currentTheme == 'dark' ? 'logo-dark' : ''" class="logo">
+          </div>
+        </div>
+      </ion-title>
+       
+    </ion-toolbar>
+  </ion-header>
+
+
+  <ion-content>
+    <div class="profile">
+    
+      <div class="container-menu-item" >
+        <ion-item  (click)="goTo('empresa-list')">
+          <span class="menu-item">Empresas</span>
+          <ion-icon class="icon-size" name="pie-chart-outline" slot="start"></ion-icon>
+        </ion-item>
+      </div>
+  
+      <div class="container-menu-item">
+        <ion-item  (click)="goTo('ordem-servico-list')">
+          <span class="menu-item">Ordem de Serviço</span>
+          <ion-icon class="icon-size" name="create-outline" slot="start"></ion-icon>
+        </ion-item>
+      </div>
+  
+      <div class="container-menu-item" >
+        <ion-item (click)="goTo('usuario-list')">
+          <span class="menu-item">Usuários</span>
+          <ion-icon class="icon-size" name="person-outline" slot="start"></ion-icon>
+        </ion-item>
+      </div>
+  
+    </div>
+  </ion-content>
+
+  
+
+  <ion-footer>
+    <div class="container-menu-item">
+      <ion-row>
+        <ion-col size="6">
+          <ion-item lines="none" (click)="logout()">
+            <span class="menu-item">Sair</span>
+            <ion-icon class="icon-size" name="log-out-outline" slot="start"></ion-icon>
+          </ion-item>
+        </ion-col>
+        <ion-col size="3">
+            <ion-item lines="none">
+              <span class="menu-item">{{version}}</span>
+            </ion-item>
+        </ion-col>
+        <ion-col size="3">
+          <ion-item lines="none" (click)="toggleDarkTheme()">
+            <ion-icon *ngIf="currentTheme == 'dark'" name="sunny-outline" slot="end" class="icon-theme"></ion-icon>
+            <ion-icon *ngIf="currentTheme != 'dark'" name="moon-outline" slot="end" class="icon-theme"></ion-icon>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+     
+    </div>
+  </ion-footer>
+</ion-menu>

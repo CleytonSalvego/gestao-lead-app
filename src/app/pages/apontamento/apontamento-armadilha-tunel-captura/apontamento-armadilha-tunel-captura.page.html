@@ -1,0 +1,55 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Capturas Realizadas</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid class="grid-top">
+    <ion-list *ngIf="listCapturas != null && listCapturas.length > 0">
+      <ion-item lines="full" style="cursor:pointer" *ngFor="let item of listCapturas">
+        <ion-row>
+          <ion-col size="8" class="format-item-captura">{{item.descricao}}</ion-col>
+          <ion-col size="4" class="format-item-captura-col">
+                <ion-input 
+                  class="input-form-text format-input-caputura"
+                  fill="outline" 
+                  placeholder="Qtde."
+                  type="number"
+                  step="1.0"
+                  [value]="item.quantidade == 0 ? '' : item.quantidade"
+                  (ionChange)="setQuantidade($event, item)">
+                </ion-input>
+          </ion-col>
+        </ion-row>
+      
+    </ion-item>
+  </ion-list>
+
+  </ion-grid>
+</ion-content>
+
+<ion-footer >
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer" (click)="salvar()">
+          <ion-buttons>
+            <ion-button >
+              Selecionar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

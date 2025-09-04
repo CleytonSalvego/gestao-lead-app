@@ -1,0 +1,118 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Apontamento</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" *ngIf="loader">
+  <app-loader-modal [mensagem]="'Aguarde...'"></app-loader-modal>
+</ion-content>
+
+<ion-content [fullscreen]="true" *ngIf="!loader">
+
+    <ion-item lines="none" class="format-input-caputura"><strong>Armadilhas</strong></ion-item>
+    <ion-item lines="none" *ngIf="loadingArmadilha">
+      <ion-spinner name="dots"></ion-spinner>
+    </ion-item>
+    <ion-grid class="grid-top" *ngIf="listArmadilha.length > 0 && !loadingArmadilha">
+      <ion-card  *ngFor="let item of listArmadilha" class="card-armadilha">
+        <ion-card-header *ngIf="item.armadilhas.length > 0">
+          <ion-card-subtitle>{{item.ordem}} - {{item.descricao}}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+            <ion-item class="item-armadilha" *ngFor="let armadilha of item.armadilhas" (click)="realizarAPontamento(armadilha)">
+              <ion-row class="armadilha-row"  >
+                <ion-col size="9" class="armadilha-item-left">{{armadilha.ordem}} - {{armadilha.descricao}}</ion-col>
+                <ion-col size="3" class="armadilha-item" [ngClass]="armadilha.status == 'OK' ? 'circulo-ok' : 'circulo-pendente'">{{armadilha.status}}</ion-col>
+                <ion-col size="12" *ngIf="armadilha.status_armadilha != null && armadilha.status_armadilha.length > 0 " class="ocorrencia">Status: {{obtemDescricaoStatusArmadilha(armadilha.status_armadilha)}}</ion-col>
+                <ion-col size="12" *ngIf="armadilha.ocorrencia != '' && armadilha.ocorrencia != null && armadilha.ocorrencia != undefined" class="ocorrencia">Ocorrência: {{armadilha.ocorrencia}}</ion-col>
+              </ion-row>
+            </ion-item>
+  
+        </ion-card-content>
+      </ion-card>
+    </ion-grid>
+
+ <ion-item lines="none" class="format-input-caputura"><strong>Ocorrências</strong></ion-item>
+  <ion-item lines="none" *ngIf="loadingOcorrencia">
+    <ion-spinner name="dots"></ion-spinner>
+  </ion-item>
+  <ion-grid class="grid-top" *ngIf="!loadingOcorrencia">
+    <ion-item *ngFor="let item of listOcorrencia" >
+      <ion-row class="armadilha-row"  >
+        <ion-col size="12" class="armadilha-item-left format-input-caputura">{{item.descricao}}</ion-col>
+      </ion-row>
+      <ion-icon aria-hidden="true" name="eye-outline" slot="end" (click)="setOpen(item, true)"></ion-icon >
+      <ion-icon size="small" aria-hidden="true" name="trash-outline" slot="end" color="danger" (click)="removerOcorrencia(item)"></ion-icon >
+    </ion-item>
+  </ion-grid>
+
+   
+  <ion-item lines="none" class="format-input-caputura"><strong>Mapas</strong></ion-item>
+  <ion-item lines="none" *ngIf="loadingMapa">
+    <ion-spinner name="dots"></ion-spinner>
+  </ion-item>
+  <ion-grid class="grid-top" *ngIf="!loadingMapa">
+    <ion-item *ngFor="let item of listMapa" >
+      <ion-row class="armadilha-row"  >
+        <ion-col size="12" class="armadilha-item-left format-input-caputura">{{item.ordem}} - {{item.descricao}}</ion-col>
+      </ion-row>
+      <ion-icon aria-hidden="true" name="eye-outline" slot="end" (click)="setOpen(item, true)"></ion-icon >
+    </ion-item>
+  </ion-grid>
+
+   
+</ion-content>
+
+<ion-content class="ion-padding" *ngIf="isModalOpen && !loader">
+  <ion-modal [isOpen]="isModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ModalTitle}}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen('',false)">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-img *ngIf="tipoArquivo == 'jpeg'"  [src]="imageSrc" class="fullscreen-image" ></ion-img>
+        <div *ngIf="tipoArquivo == 'pdf'" class="pdf-container" style="height: 100%;">
+          <iframe [src]="imageSrc"  style="width:100%; height: inherit !important" frameborder="0"></iframe>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+
+
+<ion-footer *ngIf="item.status != 3 && !loader">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer">
+          <ion-buttons class="button-size">
+            <ion-button class="button-footer" (click)="salvar()">
+              Salvar
+            </ion-button>
+            <ion-button class="button-footer button-footer-primary" (click)="finalizar()">
+              Finalizar
+            </ion-button>
+            <ion-button class="button-footer" (click)="ocorrencia()">
+              Ocorrência
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

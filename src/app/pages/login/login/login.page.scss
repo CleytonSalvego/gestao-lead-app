@@ -1,0 +1,186 @@
+app-header-new{
+  display: none !important;
+}
+
+.logo{
+  padding: 20px;
+  align-items: center;
+  max-width: 190px;
+  margin: auto;
+  display: block;
+  margin-top: 20%;
+}
+
+.text-fomated{
+  color: #667085;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px; 
+}
+
+.text-password{
+  color: #667085;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  margin-top: 25px;
+  cursor: pointer;
+}
+
+.login-form{
+  width: 90%;
+  height: 276px;
+  margin: auto;
+  margin-top: 20px;
+  // background-color: red;
+}
+
+.input-form{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  margin-bottom: 15px;
+  max-height: 95px;
+}
+
+.input-fill-outline.sc-ion-input-md-h {
+  --border-radius: 8px;
+}
+
+.input-form-text{
+  color: var(--gray-500, #667085);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.input-formated{
+  border-radius: 8px;
+  border: 1px solid var(--gray-300, #D0D5DD);
+  background: var(--white, #FFF);
+  box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+}
+
+.label-form{
+  color: var(--gray-700, #344054);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 6px;
+}
+
+
+ion-button{
+  margin: 0px;
+  height: 56px;
+  --box-shadow:none;
+  margin-top: 20px;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.btn-login-invalid{
+  --background: #EAECF0;
+  --color: #667085;
+}
+
+.btn-login-valid{
+  --background: var(--ion-color-primary);
+  --color: white;
+}
+
+ion-footer{
+  max-width: 100%;
+  --box-shadow:none;
+  --background-image: none;
+  max-height: 80px;
+  align-items: center;
+}
+
+.footer-md::before {
+  bottom: auto;
+  width: 100%;
+  height: 2px;
+  align-items: center;
+  background-image: none;
+  background-repeat: no-repeat;
+  content: "";
+}
+
+.text-footer{
+  color: #175CD3;
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-footer{
+  align-items: right;
+  max-width: 25px;
+}
+
+
+.column{
+  display: inline-block;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 2px;
+}
+
+.column-left{
+  text-align: left;
+  width: 65%;
+}
+
+.column-right{
+  text-align: right;
+  width: 35%;
+}
+
+
+.invalid {
+  border: 1px solid #ea6153;
+}
+
+.icon-input{
+  position: relative;
+  right: -90%;
+  top: -22px;
+  font-size: 35px;
+  color: #D92D20;
+}
+
+.error-form{
+  color: #D92D20;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 2px;
+}
+
+.whatsapp-form{
+  position: fixed;
+  bottom: 5;
+  width: 100%;
+}
+
+
+

@@ -1,0 +1,18 @@
+.hiddenMenu {
+    display: none;
+}
+
+ion-router-outlet {
+    --ion-safe-area-top: 50px;
+    //top: 50px;
+
+}
+
+.hidden-ios-header {
+    --ion-safe-area-top: 0px;
+}
+
+ion-content {
+    top: 0px;
+}
+

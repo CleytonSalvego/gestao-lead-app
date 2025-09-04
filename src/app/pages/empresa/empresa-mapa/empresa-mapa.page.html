@@ -1,0 +1,113 @@
+
+<ion-header>
+  <ion-toolbar class="toolbar-header">
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon class="ion-icon-back" name="arrow-back" (click)="dismiss()"></ion-icon>
+      </ion-col>
+      <ion-col size="10">
+        <div class="ion-text-center text-header title"><strong>Selecionar Mapa</strong></div>
+      </ion-col>
+      <ion-col size="1"></ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid class="grid-top">
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="numeroOrdem"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="N° Ordem"
+          type="number"
+          step="1.0">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="input-form ">
+        <ion-input 
+          [(ngModel)]="descricao"
+          class="input-form-text"
+          fill="outline" 
+          placeholder="Descrição">
+        </ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <div class="toogle-input div-icon-center margin-button">
+        <!-- <ion-button expand="block" (click)="triggerFileInput()">Selecionar PDF</ion-button> -->
+        <ion-icon aria-hidden="true" name="image-outline" slot="end" color="primary" (click)="triggerFileInput()"></ion-icon >
+        <input
+          type="file"
+          #fileInput
+          style="display: none"
+          (change)="handleFileSelection($event)"
+          accept="application/pdf"
+        />
+          <!-- <ion-icon aria-hidden="true" name="image-outline" slot="end" color="primary" (click)="getPhotoGallery()"></ion-icon > -->
+      </div>
+      <div class="toogle-input div-icon-center margin-button">
+        <ion-icon aria-hidden="true" name="camera-outline" slot="end" color="primary" (click)="getPhotoCamera()"></ion-icon >
+    </div>
+    </ion-item>
+
+   
+
+    <ion-item lines="none" *ngIf="filePath == 'pdf'" class="fileMargin">
+      <ion-grid>
+        <ion-row>
+          <ion-text  color="samll">
+            <strong>Arquivo selecionado</strong>
+          </ion-text>
+        </ion-row>
+        <ion-row class="fileMarginItem">
+          <ion-text  color="small">
+            {{fileName}}
+          </ion-text>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+
+    <ion-item lines="none" *ngIf="filePath == 'jpeg'" class="fileMargin">
+      <ion-grid>
+        <ion-row>
+          <ion-text  color="samll">
+            <strong>Imagem selecionada</strong>
+          </ion-text>
+        </ion-row>
+        <ion-row>
+          <div>
+            <ion-img [src]="imagemBase64" class="img-photo box-imagem" ></ion-img>
+          </div>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+    
+  </ion-grid>
+
+ 
+ 
+</ion-content>
+
+<ion-footer >
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="12">
+        <div class="ion-text-center box-footer text-footer">
+          <ion-buttons>
+            <ion-button (click)="salvar()">
+              Selecionar
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,86 @@
+<ion-backdrop *ngIf="showBackDrop"></ion-backdrop>
+
+<ion-content [fullscreen]="true"  >
+
+  <ion-content [fullscreen]="true" *ngIf="loading">
+    <app-loader-modal [mensagem]="'Aguarde...'"></app-loader-modal>
+  </ion-content>
+
+  <ion-grid class="grid-margin" *ngIf="!loading">
+    <app-skeleton-list *ngIf="!loaded"></app-skeleton-list>
+  </ion-grid>
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" *ngIf="!loading">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="circles"
+      refreshingText="Carregando...">
+    </ion-refresher-content>
+  </ion-refresher>
+  
+  <ion-header class="toolbar-search" *ngIf="loaded && !loading">
+    <ion-toolbar collapse="condense" class="header-fixed " >
+      <ion-row>
+        <ion-col size="12">
+          <app-search-item (ionInput)="handleInput($event)" [placeHolder]="'Buscar por nome'"></app-search-item>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-grid class="grid-top" *ngIf="loaded && !loading">
+    <ion-list *ngIf="results.length > 0">
+      <ion-item-sliding *ngFor="let item of results">
+        <ion-item lines="full" style="cursor:pointer" >
+          <app-item-list 
+            [codigo]="item.id"
+            [data]="item.data" 
+            [hora]="item.hora"
+            [status]="item.descricao_status"
+            [empresa]="item.descricao_empresa"
+            [tecnico]="item.descricao_tecnico" 
+            [local]="item.local"
+            (click)="showApontamento(item)">
+        </app-item-list>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option class="ion-item-options-success" (click)="editar(item)">Editar</ion-item-option>
+        <ion-item-option class="ion-item-options-danger" (click)="remover(item)">Remover</ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+    </ion-list>
+  </ion-grid>
+  
+</ion-content>
+
+<ion-footer *ngIf="!loading">
+  <ion-toolbar>
+    <ion-row>
+      <ion-col class="4">
+        <div class="ion-text-center text-footer" [ngClass]="currentFiltro == 'HOJE' ? 'box-footer-focus' : 'box-footer'" (click)="loadHoje()">
+          <ion-buttons>
+            <ion-button >
+              Hoje
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+      <ion-col class="4">
+        <div class="ion-text-center text-footer" [ngClass]="currentFiltro == 'TODOS' ? 'box-footer-focus' : 'box-footer'" (click)="loadData()">
+          <ion-buttons>
+            <ion-button >
+              Todas
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+      <ion-col class="4">
+        <div class="ion-text-center box-footer text-footer" (click)="showCreate()">
+          <ion-buttons>
+            <ion-button >
+              Novo
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>
