@@ -22,6 +22,11 @@
             "assets": [
               {
                 "glob": "**/*",
+                "input": "src/assets/jeep-sqlite",
+                "output": "assets/jeep-sqlite"
+              },
+              {
+                "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
               },
@@ -49,8 +54,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "10kb",
+                  "maximumError": "20kb"
                 }
               ],
               "fileReplacements": [

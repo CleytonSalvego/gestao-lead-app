@@ -1,0 +1,49 @@
+<div class="coming-soon-container">
+  <div class="coming-soon-content">
+    <!-- Icon Container -->
+    <div class="icon-container">
+      <div class="icon-background">
+        <ion-icon [name]="icon" [color]="iconColor" class="main-icon"></ion-icon>
+      </div>
+      <div class="icon-decoration"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="text-content">
+      <h1 class="title">{{ title }}</h1>
+      <h2 class="subtitle">{{ subtitle }}</h2>
+      <p class="description">{{ description }}</p>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="progress-section">
+      <div class="progress-dots">
+        <div class="dot active"></div>
+        <div class="dot active"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <p class="progress-text">Em desenvolvimento...</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <ion-button fill="outline" color="medium" size="default">
+        <ion-icon name="notifications-outline" slot="start"></ion-icon>
+        Notificar quando pronto
+      </ion-button>
+      <ion-button fill="clear" color="primary" size="default">
+        <ion-icon name="arrow-back" slot="start"></ion-icon>
+        Voltar
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Background Decoration -->
+  <div class="background-decoration">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
+</div>

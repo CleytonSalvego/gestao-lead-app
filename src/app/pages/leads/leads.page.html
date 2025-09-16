@@ -1,0 +1,33 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-title-container">
+      <ion-title>Leads</ion-title>
+      <p class="toolbar-subtitle">Capture, qualifique e converta leads em vendas</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Leads Page Container -->
+  <div class="page-container">
+
+    <!-- Leads Content -->
+    <div class="leads-content">
+      <app-coming-soon
+        title="Gerenciamento de Leads"
+        subtitle="Capture, qualifique e converta leads"
+        description="Gerencie todo o ciclo de vida dos leads: desde a captura até a conversão. Ferramentas de scoring, segmentação e nurturing automatizado."
+        icon="people-outline"
+        iconColor="primary">
+      </app-coming-soon>
+    </div>
+  </div>
+</ion-content>

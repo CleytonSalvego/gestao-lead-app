@@ -1,0 +1,247 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-title-container">
+      <ion-title>Integração ERP</ion-title>
+      <p class="toolbar-subtitle">Conecte e gerencie integrações com sistemas ERP</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="exportData()">
+        <ion-icon name="download" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Stats Cards -->
+  <div class="stats-container">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.totalIntegrations }}</div>
+              <div class="stat-label">Integrações</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.activeIntegrations }}</div>
+              <div class="stat-label">Ativas</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.todaySync }}</div>
+              <div class="stat-label">Sync Hoje</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.pendingInvoices }}</div>
+              <div class="stat-label">NFe Pendentes</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Segment Navigation -->
+  <ion-segment [(ngModel)]="selectedSegment" color="primary">
+    <ion-segment-button value="overview">
+      <ion-icon name="analytics"></ion-icon>
+      <ion-label>Visão Geral</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="integrations">
+      <ion-icon name="link"></ion-icon>
+      <ion-label>Integrações</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="invoices">
+      <ion-icon name="receipt"></ion-icon>
+      <ion-label>Faturas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="commissions">
+      <ion-icon name="wallet"></ion-icon>
+      <ion-label>Comissões</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Overview Tab -->
+  <div *ngIf="selectedSegment === 'overview'" class="tab-content">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Últimas Sincronizações</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let sync of recentSync">
+            <ion-icon 
+              [name]="sync.success ? 'checkmark-circle' : 'alert-circle'" 
+              [color]="sync.success ? 'primary' : 'danger'"
+              slot="start">
+            </ion-icon>
+            <ion-label>
+              <h3>{{ sync.processedRecords }} registros processados</h3>
+              <p>{{ sync.timestamp | date:'dd/MM/yyyy HH:mm' }}</p>
+              <p *ngIf="!sync.success && sync.errors.length > 0" class="error-text">{{ sync.errors[0].message }}</p>
+            </ion-label>
+            <ion-chip [color]="sync.success ? 'primary' : 'danger'" slot="end">
+              {{ sync.success ? 'Sucesso' : 'Erro' }}
+            </ion-chip>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Resumo Financeiro do Mês</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="financial-summary">
+          <div class="summary-item">
+            <span class="label">Receita Total:</span>
+            <span class="value">R$ {{ stats.monthlyRevenue | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Faturas Pendentes:</span>
+            <span class="value">{{ stats.pendingInvoices }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Integrations Tab -->
+  <div *ngIf="selectedSegment === 'integrations'" class="tab-content">
+    <ion-card *ngFor="let integration of integrations">
+      <ion-card-header>
+        <ion-card-title>{{ integration.name }}</ion-card-title>
+        <ion-card-subtitle>{{ integration.type }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <div class="integration-info">
+                <p><strong>Host:</strong> {{ integration.config.host }}</p>
+                <p><strong>Última Sync:</strong> {{ integration.lastSync | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p><strong>Status:</strong> 
+                  <ion-chip [color]="getStatusColor(integration.status)">
+                    {{ integration.status === 'active' ? 'Ativo' : integration.status === 'inactive' ? 'Inativo' : 'Erro' }}
+                  </ion-chip>
+                </p>
+              </div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-button 
+                fill="outline" 
+                size="small" 
+                (click)="testConnection(integration)"
+                [disabled]="integration.status === 'error'">
+                <ion-icon name="pulse" slot="start"></ion-icon>
+                Testar Conexão
+              </ion-button>
+              <ion-button 
+                fill="solid" 
+                size="small" 
+                color="primary"
+                (click)="syncIntegration(integration)"
+                [disabled]="integration.status !== 'active'"
+                style="margin-left: 8px;">
+                <ion-icon name="sync" slot="start"></ion-icon>
+                Sincronizar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Invoices Tab -->
+  <div *ngIf="selectedSegment === 'invoices'" class="tab-content">
+    <div class="tab-header">
+      <ion-button (click)="generateInvoice()" color="primary">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nova Fatura
+      </ion-button>
+    </div>
+
+    <ion-card *ngFor="let invoice of pendingInvoices">
+      <ion-card-header>
+        <ion-card-title>{{ invoice.number }}</ion-card-title>
+        <ion-card-subtitle>{{ invoice.clientName }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <p><strong>CPF/CNPJ:</strong> {{ invoice.clientDocument }}</p>
+              <p><strong>Data Emissão:</strong> {{ invoice.issueDate | date:'dd/MM/yyyy' }}</p>
+            </ion-col>
+            <ion-col size="6">
+              <p><strong>Valor:</strong> R$ {{ invoice.totalAmount | number:'1.2-2' }}</p>
+              <p><strong>Vencimento:</strong> {{ invoice.dueDate | date:'dd/MM/yyyy' }}</p>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-chip [color]="getInvoiceStatusColor(invoice.status)">
+                {{ invoice.status === 'draft' ? 'Rascunho' : 
+                   invoice.status === 'issued' ? 'Emitida' : 
+                   invoice.status === 'paid' ? 'Paga' : invoice.status }}
+              </ion-chip>
+              <span *ngIf="invoice.erpReference" class="erp-ref">
+                ERP: {{ invoice.erpReference }}
+              </span>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Commissions Tab -->
+  <div *ngIf="selectedSegment === 'commissions'" class="tab-content">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Comissões - Setembro 2025</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let commission of monthlyCommissions">
+            <ion-label>
+              <h3>{{ commission.type === 'sale' ? 'Venda' : 
+                     commission.type === 'renewal' ? 'Renovação' : 
+                     commission.type === 'upsell' ? 'Upsell' : 'Cross-sell' }}</h3>
+              <p>Base: R$ {{ commission.baseAmount | number:'1.2-2' }} | 
+                 Taxa: {{ (commission.rate * 100) | number:'1.1-1' }}%</p>
+              <p *ngIf="commission.erpReference" class="erp-ref">ERP: {{ commission.erpReference }}</p>
+            </ion-label>
+            <div slot="end" class="commission-amount">
+              <div class="amount">R$ {{ commission.amount | number:'1.2-2' }}</div>
+              <ion-chip [color]="getCommissionStatusColor(commission.status)" size="small">
+                {{ commission.status === 'pending' ? 'Pendente' : 
+                   commission.status === 'calculated' ? 'Calculada' : 
+                   commission.status === 'paid' ? 'Paga' : commission.status }}
+              </ion-chip>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

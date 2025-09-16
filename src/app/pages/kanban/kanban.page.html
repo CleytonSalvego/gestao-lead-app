@@ -1,0 +1,166 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <div class="toolbar-container">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <div class="toolbar-title-container">
+        <ion-title>Kanban de Leads</ion-title>
+        <p class="toolbar-subtitle">Gerencie o pipeline de vendas de forma visual e eficiente</p>
+      </div>
+      <div class="toolbar-controls">
+        <div class="filter-controls">
+          <span>Filtro:</span>
+          <ion-select interface="popover" placeholder="Todos produtos" [(ngModel)]="selectedFilter">
+          <ion-select-option value="all">Todos produtos</ion-select-option>
+          <ion-select-option value="auto">Auto</ion-select-option>
+          <ion-select-option value="residencial">Residencial</ion-select-option>
+          <ion-select-option value="vida">Vida</ion-select-option>
+          <ion-select-option value="saude">Saúde</ion-select-option>
+        </ion-select>
+      </div>
+        <div class="search-container">
+          <ion-searchbar 
+            placeholder="Buscar lead, cliente ou apólice" 
+            [debounce]="300"
+            (ionInput)="onSearchChange($event)">
+          </ion-searchbar>
+        </div>
+      <ion-button 
+        class="manage-columns-btn" 
+        fill="outline" 
+        color="medium" 
+        (click)="toggleColumnManagement()">
+        <ion-icon name="settings" slot="start"></ion-icon>
+        Gerenciar Colunas
+      </ion-button>
+      <ion-button class="new-lead-btn" fill="solid" color="primary" (click)="createNewLead()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Novo Lead
+      </ion-button>
+      </div>
+      <ion-buttons slot="end">
+        <ion-button fill="clear" (click)="onRefresh()">
+          <ion-icon name="refresh-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Kanban Page Container -->
+  <div class="page-container">
+
+  <!-- Column Management Panel -->
+  <div class="column-management" *ngIf="showColumnManagement">
+    <div class="management-header">
+      <h3>Gerenciar Colunas do Kanban</h3>
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        color="primary"
+        (click)="addColumn()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Adicionar Coluna
+      </ion-button>
+    </div>
+    
+    <div class="columns-list">
+      <div class="column-item" *ngFor="let column of columns; let i = index">
+        <div class="column-info">
+          <ion-chip [color]="column.color">{{ column.title }}</ion-chip>
+          <span class="column-position">Posição: {{ column.position }}</span>
+        </div>
+        
+        <div class="column-actions">
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            (click)="moveColumn(column, 'left')"
+            [disabled]="i === 0">
+            <ion-icon name="chevron-back" slot="icon-only"></ion-icon>
+          </ion-button>
+          
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            (click)="moveColumn(column, 'right')"
+            [disabled]="i === columns.length - 1">
+            <ion-icon name="chevron-forward" slot="icon-only"></ion-icon>
+          </ion-button>
+          
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            color="warning"
+            (click)="editColumn(column)">
+            <ion-icon name="create" slot="icon-only"></ion-icon>
+          </ion-button>
+          
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            color="danger"
+            (click)="deleteColumn(column)"
+            [disabled]="columns.length <= 1">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kanban Board -->
+  <div class="kanban-content" *ngIf="!isLoading">
+    <div class="kanban-board">
+      <div 
+        class="kanban-column" 
+        *ngFor="let column of columns"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event, column.status)"
+        (dragleave)="onDragLeave($event)">
+        <div class="column-header">
+          <h3>{{ column.title }}</h3>
+          <span class="lead-count">{{ getColumnLeads(column.status).length }}</span>
+        </div>
+        
+        <div class="leads-container">
+          <div 
+            class="lead-card" 
+            *ngFor="let lead of getColumnLeads(column.status)"
+            draggable="true"
+            (dragstart)="onDragStart($event, lead)"
+            (dragend)="onDragEnd($event)">
+            <div class="lead-header">
+              <span class="consultant-name">{{ lead.name }}</span>
+              <span class="progress-percentage">{{ lead.score }}%</span>
+            </div>
+            <div class="lead-info">
+              <span class="product-type">{{ lead.product }} • {{ lead.id }}</span>
+              <span class="date">{{ lead.lastContact | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div class="lead-actions">
+              <ion-button size="small" fill="clear" (click)="openLead(lead)">Abrir</ion-button>
+              <ion-button size="small" fill="clear" (click)="chatWithAI(lead)">Chat IA</ion-button>
+              <ion-button size="small" fill="clear" (click)="viewHistory(lead)">Histórico</ion-button>
+            </div>
+          </div>
+
+          <div class="empty-column" *ngIf="getColumnLeads(column.status).length === 0">
+            <ion-icon name="add-circle-outline"></ion-icon>
+            <p>Nenhum lead nesta etapa</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando kanban...</p>
+  </div>
+  
+  </div>
+</ion-content>

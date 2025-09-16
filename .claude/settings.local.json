@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ionic build)",
+      "Bash(ng build:*)",
+      "Bash(ionic generate:*)",
+      "Bash(find:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm start)",
+      "Bash(ng serve:*)",
+      "Bash(npx sass:*)",
+      "Bash(npx ng build:*)",
+      "Bash(npm install:*)",
+      "Bash(npx cap:*)",
+      "Bash(npm run start:*)",
+      "Bash(npm view:*)",
+      "Read(//c/Projetos/17 - Kleber/pcm-app/**)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

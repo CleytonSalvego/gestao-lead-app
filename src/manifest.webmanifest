@@ -1,4 +1,11 @@
 {
+  "name": "Gestão Lead",
+  "short_name": "GestãoLead",
+  "description": "Sistema de gestão de leads e CRM para consultores de seguros",
+  "theme_color": "#3880ff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
   "icons": [
     {
       "src": "assets/icons/icon-48.webp",

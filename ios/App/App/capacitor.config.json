@@ -1,0 +1,17 @@
+{
+	"appId": "com.portoseguro.crm",
+	"appName": "Porto Seguro CRM",
+	"webDir": "www",
+	"packageClassList": [
+		"FileOpenerPlugin",
+		"CapacitorSQLitePlugin",
+		"AppPlugin",
+		"CAPCameraPlugin",
+		"FilesystemPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"PreferencesPlugin",
+		"StatusBarPlugin",
+		"BackgroundTaskPlugin"
+	]
+}

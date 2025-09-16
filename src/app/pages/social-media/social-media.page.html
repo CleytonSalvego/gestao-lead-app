@@ -1,0 +1,411 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button menu="main-menu"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Redes Sociais</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshData()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Redes Sociais</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Stats Cards -->
+  <div class="stats-container" *ngIf="stats">
+    <ion-row>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-value">{{ stats.totalPosts }}</div>
+            <div class="stat-label">Posts</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-value">{{ stats.totalReels }}</div>
+            <div class="stat-label">Reels</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-value">{{ stats.totalCampaigns }}</div>
+            <div class="stat-label">Campanhas</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <div class="stat-value">{{ formatNumber(stats.totalReach) }}</div>
+            <div class="stat-label">Alcance Total</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </div>
+
+  <!-- Filters -->
+  <ion-card class="filter-card" *ngIf="connectedPages.length > 0">
+    <ion-card-content>
+      <ion-row>
+        <ion-col size="12" size-md="3">
+          <ion-select [(ngModel)]="currentFilter.platform" (ionChange)="onFilterChange()" placeholder="Todas as Plataformas">
+            <ion-select-option value="all">Todas as Plataformas</ion-select-option>
+            <ion-select-option value="facebook">Facebook</ion-select-option>
+            <ion-select-option value="instagram">Instagram</ion-select-option>
+            <ion-select-option value="linkedin">LinkedIn</ion-select-option>
+            <ion-select-option value="twitter">Twitter</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="3">
+          <ion-select [(ngModel)]="currentFilter.type" (ionChange)="onFilterChange()" placeholder="Todos os Tipos">
+            <ion-select-option value="all">Todos os Tipos</ion-select-option>
+            <ion-select-option value="post">Posts</ion-select-option>
+            <ion-select-option value="reel">Reels</ion-select-option>
+            <ion-select-option value="story">Stories</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="3">
+          <ion-select [(ngModel)]="currentFilter.sortBy" (ionChange)="onFilterChange()" placeholder="Ordenar por">
+            <ion-select-option value="date">Data</ion-select-option>
+            <ion-select-option value="engagement">Engajamento</ion-select-option>
+            <ion-select-option value="reach">Alcance</ion-select-option>
+            <ion-select-option value="likes">Curtidas</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="3">
+          <ion-select [(ngModel)]="viewMode" (ionChange)="onViewModeChange()" placeholder="Visualização">
+            <ion-select-option value="all">Tudo</ion-select-option>
+            <ion-select-option value="posts">Apenas Posts</ion-select-option>
+            <ion-select-option value="campaigns">Apenas Campanhas</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Connected Pages -->
+  <ion-card *ngIf="connectedPages.length > 0" class="pages-card">
+    <ion-card-header>
+      <ion-card-title>Páginas Conectadas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-row>
+        <ion-col size="12" size-md="4" *ngFor="let page of connectedPages">
+          <div class="page-item">
+            <div class="page-header">
+              <img [src]="page.profilePicture" [alt]="page.name" class="page-avatar">
+              <div class="page-info">
+                <h3>{{ page.name }}</h3>
+                <p class="page-platform">{{ getPlatformName(page.platform) }}</p>
+              </div>
+              <ion-icon *ngIf="page.verified" name="checkmark-circle" class="verified-icon"></ion-icon>
+            </div>
+            <div class="page-metrics">
+              <div class="metric">
+                <span class="metric-value">{{ formatNumber(page.followers) }}</span>
+                <span class="metric-label">Seguidores</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value">{{ page.metrics.totalPosts }}</span>
+                <span class="metric-label">Posts</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value">{{ page.metrics.avgEngagement.toFixed(1) }}%</span>
+                <span class="metric-label">Engajamento</span>
+              </div>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- No Integration Message -->
+  <ion-card *ngIf="connectedPages.length === 0 && !isLoading" class="empty-state">
+    <ion-card-content>
+      <ion-icon name="link-outline" size="large"></ion-icon>
+      <h3>Nenhuma integração de redes sociais configurada</h3>
+      <p>
+        Para visualizar posts, reels e campanhas, você precisa primeiro configurar as integrações
+        com suas páginas de redes sociais na tela de APIs & Webhooks.
+      </p>
+      <ion-button routerLink="/integrations" color="primary" fill="solid">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Configurar Integrações
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Content Tabs -->
+  <div class="content-tabs" [ngSwitch]="viewMode">
+    <!-- Posts and Reels -->
+    <div *ngSwitchCase="'posts'" class="posts-section">
+      <div *ngIf="isLoading" class="loading-container">
+        <ion-spinner></ion-spinner>
+        <p>Carregando posts...</p>
+      </div>
+
+      <div *ngIf="!isLoading && filteredPosts.length === 0" class="no-data">
+        <ion-icon name="images-outline" size="large"></ion-icon>
+        <h3>Nenhum post encontrado</h3>
+        <p>Não há posts que correspondam aos filtros selecionados.</p>
+      </div>
+
+      <ion-row *ngIf="!isLoading && filteredPosts.length > 0">
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let post of filteredPosts">
+          <ion-card class="post-card" (click)="openPostDetail(post)">
+            <div class="post-header">
+              <div class="post-platform">
+                <ion-icon [name]="getPlatformIcon(post.platform)" class="platform-icon"></ion-icon>
+                <span>{{ getPlatformName(post.platform) }}</span>
+              </div>
+              <div class="post-type">
+                <ion-chip [color]="getTypeColor(post.type)">{{ getTypeName(post.type) }}</ion-chip>
+              </div>
+            </div>
+
+            <div class="post-media" *ngIf="post.thumbnail">
+              <img [src]="post.thumbnail" [alt]="post.content.text" class="post-image">
+              <div class="post-overlay" *ngIf="post.type === 'reel'">
+                <ion-icon name="play-circle" size="large"></ion-icon>
+              </div>
+            </div>
+
+            <ion-card-content>
+              <p class="post-text" [innerHTML]="post.content.text"></p>
+
+              <div class="post-hashtags" *ngIf="post.content.hashtags && post.content.hashtags.length > 0">
+                <ion-chip *ngFor="let hashtag of post.content.hashtags.slice(0, 3)" size="small" color="tertiary">
+                  {{ hashtag }}
+                </ion-chip>
+                <span *ngIf="post.content.hashtags.length > 3">+{{ post.content.hashtags.length - 3 }}</span>
+              </div>
+
+              <div class="post-metrics">
+                <div class="metric-item">
+                  <ion-icon name="heart" color="danger"></ion-icon>
+                  <span>{{ formatNumber(post.metrics.likes) }}</span>
+                </div>
+                <div class="metric-item">
+                  <ion-icon name="chatbubble" color="primary"></ion-icon>
+                  <span>{{ formatNumber(post.metrics.comments) }}</span>
+                </div>
+                <div class="metric-item">
+                  <ion-icon name="share-social" color="secondary"></ion-icon>
+                  <span>{{ formatNumber(post.metrics.shares) }}</span>
+                </div>
+                <div class="metric-item">
+                  <ion-icon name="eye" color="medium"></ion-icon>
+                  <span>{{ formatNumber(post.metrics.reach) }}</span>
+                </div>
+              </div>
+
+              <div class="post-date">
+                <small>{{ formatDate(post.createdAt) }}</small>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <!-- Campaigns -->
+    <div *ngSwitchCase="'campaigns'" class="campaigns-section">
+      <div *ngIf="isLoadingCampaigns" class="loading-container">
+        <ion-spinner></ion-spinner>
+        <p>Carregando campanhas...</p>
+      </div>
+
+      <div *ngIf="!isLoadingCampaigns && filteredCampaigns.length === 0" class="no-data">
+        <ion-icon name="megaphone-outline" size="large"></ion-icon>
+        <h3>Nenhuma campanha encontrada</h3>
+        <p>Não há campanhas que correspondam aos filtros selecionados.</p>
+      </div>
+
+      <ion-row *ngIf="!isLoadingCampaigns && filteredCampaigns.length > 0">
+        <ion-col size="12" size-md="6" *ngFor="let campaign of filteredCampaigns">
+          <ion-card class="campaign-card" (click)="openCampaignDetail(campaign)">
+            <ion-card-header>
+              <div class="campaign-header">
+                <div class="campaign-title">
+                  <h2>{{ campaign.name }}</h2>
+                  <div class="campaign-platform">
+                    <ion-icon [name]="getPlatformIcon(campaign.platform)" class="platform-icon"></ion-icon>
+                    <span>{{ getPlatformName(campaign.platform) }}</span>
+                  </div>
+                </div>
+                <ion-chip [color]="getStatusColor(campaign.status)">{{ getStatusName(campaign.status) }}</ion-chip>
+              </div>
+            </ion-card-header>
+
+            <ion-card-content>
+              <div class="campaign-budget">
+                <div class="budget-info">
+                  <span class="budget-label">Orçamento:</span>
+                  <span class="budget-value">R$ {{ campaign.budget.total.toLocaleString('pt-BR') }}</span>
+                </div>
+                <div class="budget-spent">
+                  <span class="spent-label">Gasto:</span>
+                  <span class="spent-value">R$ {{ campaign.budget.spent.toLocaleString('pt-BR') }}</span>
+                </div>
+                <ion-progress-bar
+                  [value]="campaign.budget.spent / campaign.budget.total"
+                  [color]="campaign.budget.spent / campaign.budget.total > 0.8 ? 'danger' : 'primary'">
+                </ion-progress-bar>
+              </div>
+
+              <div class="campaign-metrics">
+                <div class="metric-row">
+                  <div class="metric-item">
+                    <span class="metric-label">Impressões</span>
+                    <span class="metric-value">{{ formatNumber(campaign.metrics.impressions) }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Cliques</span>
+                    <span class="metric-value">{{ formatNumber(campaign.metrics.clicks) }}</span>
+                  </div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-item">
+                    <span class="metric-label">CTR</span>
+                    <span class="metric-value">{{ campaign.metrics.ctr.toFixed(2) }}%</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Leads</span>
+                    <span class="metric-value">{{ campaign.metrics.leads }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="campaign-date">
+                <small>Criada em {{ formatDate(campaign.createdAt) }}</small>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <!-- All Content -->
+    <div *ngSwitchDefault>
+      <!-- Posts Section -->
+      <ion-card *ngIf="filteredPosts.length > 0">
+        <ion-card-header>
+          <ion-card-title>Posts Recentes</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-row>
+            <ion-col size="12" size-md="6" size-lg="4" *ngFor="let post of filteredPosts.slice(0, 3)">
+              <ion-card class="post-card small" (click)="openPostDetail(post)">
+                <div class="post-header">
+                  <ion-icon [name]="getPlatformIcon(post.platform)" class="platform-icon"></ion-icon>
+                  <ion-chip [color]="getTypeColor(post.type)" size="small">{{ getTypeName(post.type) }}</ion-chip>
+                </div>
+
+                <div class="post-media" *ngIf="post.thumbnail">
+                  <img [src]="post.thumbnail" [alt]="post.content.text" class="post-image">
+                  <div class="post-overlay" *ngIf="post.type === 'reel'">
+                    <ion-icon name="play-circle" size="large"></ion-icon>
+                  </div>
+                </div>
+
+                <ion-card-content>
+                  <p class="post-text-small">{{ post.content.text | slice:0:80 }}...</p>
+
+                  <div class="post-metrics-detailed">
+                    <div class="metric-item">
+                      <ion-icon name="heart" color="danger"></ion-icon>
+                      <span>{{ formatNumber(post.metrics.likes) }}</span>
+                      <small>Curtidas</small>
+                    </div>
+                    <div class="metric-item">
+                      <ion-icon name="chatbubble" color="primary"></ion-icon>
+                      <span>{{ formatNumber(post.metrics.comments) }}</span>
+                      <small>Comentários</small>
+                    </div>
+                    <div class="metric-item">
+                      <ion-icon name="share-social" color="secondary"></ion-icon>
+                      <span>{{ formatNumber(post.metrics.shares) }}</span>
+                      <small>Reações</small>
+                    </div>
+                    <div class="metric-item">
+                      <ion-icon name="eye" color="medium"></ion-icon>
+                      <span>{{ formatNumber(post.metrics.reach) }}</span>
+                      <small>Alcance</small>
+                    </div>
+                  </div>
+
+                  <div class="post-date">
+                    <small>{{ formatDate(post.createdAt) }}</small>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+          <ion-button fill="clear" (click)="setViewMode('posts')" *ngIf="filteredPosts.length > 3">
+            Ver todos os posts
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- No Data Message -->
+      <ion-card *ngIf="connectedPages.length === 0 && filteredPosts.length === 0 && filteredCampaigns.length === 0 && !isLoading" class="empty-state">
+        <ion-card-content>
+          <ion-icon name="albums-outline" size="large"></ion-icon>
+          <h3>Nenhum conteúdo disponível</h3>
+          <p>
+            Configure suas integrações de redes sociais para começar a visualizar posts, reels e campanhas.
+          </p>
+          <ion-button routerLink="/integrations" color="primary" fill="outline">
+            <ion-icon name="settings-outline" slot="start"></ion-icon>
+            Ir para Integrações
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Campaigns Section -->
+      <ion-card *ngIf="filteredCampaigns.length > 0">
+        <ion-card-header>
+          <ion-card-title>Campanhas Ativas</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-row>
+            <ion-col size="12" size-md="6" *ngFor="let campaign of filteredCampaigns.slice(0, 4)">
+              <ion-card class="campaign-card small" (click)="openCampaignDetail(campaign)">
+                <ion-card-content>
+                  <div class="campaign-summary">
+                    <h3>{{ campaign.name }}</h3>
+                    <ion-chip [color]="getStatusColor(campaign.status)" size="small">{{ getStatusName(campaign.status) }}</ion-chip>
+                  </div>
+                  <div class="campaign-metrics-small">
+                    <span>{{ formatNumber(campaign.metrics.leads) }} leads</span>
+                    <span>R$ {{ campaign.budget.spent.toLocaleString('pt-BR') }} gasto</span>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+          <ion-button fill="clear" (click)="setViewMode('campaigns')" *ngIf="filteredCampaigns.length > 4">
+            Ver todas as campanhas
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

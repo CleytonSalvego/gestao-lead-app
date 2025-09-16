@@ -1,10 +1,10 @@
-<ion-menu contentId="main-content" class="menu-content">
+<ion-menu contentId="main-content" type="push" class="menu-content">
   <ion-header>
     <ion-toolbar>
       <ion-title class="title-menu">
         <div class="header-menu">
           <div (click)="goToHome()" [ngClass]="isAndroid ? 'logo-header-android' : 'logo-header-ios'">
-            <img src="../../../assets/logo-main.png" [ngClass]="currentTheme == 'dark' ? 'logo-dark' : ''" class="logo">
+            <img src="../../../assets/logo-compact.svg" class="logo">
           </div>
         </div>
       </ion-title>
@@ -16,25 +16,169 @@
   <ion-content>
     <div class="profile">
     
-      <div class="container-menu-item" >
-        <ion-item  (click)="goTo('empresa-list')">
-          <span class="menu-item">Empresas</span>
-          <ion-icon class="icon-size" name="pie-chart-outline" slot="start"></ion-icon>
-        </ion-item>
+      <!-- Seção Principal -->
+      <div class="menu-section" *ngIf="canViewDashboard()">
+        <div class="section-title">
+          <span>PRINCIPAL</span>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item  (click)="goTo('dashboard')">
+            <span class="menu-item">Dashboard</span>
+            <ion-icon class="icon-size" name="analytics-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
       </div>
-  
-      <div class="container-menu-item">
-        <ion-item  (click)="goTo('ordem-servico-list')">
-          <span class="menu-item">Ordem de Serviço</span>
-          <ion-icon class="icon-size" name="create-outline" slot="start"></ion-icon>
-        </ion-item>
+
+      <!-- Seção Vendas -->
+      <div class="menu-section" *ngIf="canViewLeads() || canViewConsultants()">
+        <div class="section-title">
+          <span>VENDAS</span>
+        </div>
+
+        <div class="container-menu-item" *ngIf="canViewLeads()">
+          <ion-item  (click)="goTo('leads')">
+            <span class="menu-item">Leads</span>
+            <ion-icon class="icon-size" name="people-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" *ngIf="canViewLeads()">
+          <ion-item (click)="goTo('kanban')">
+            <span class="menu-item">Kanban</span>
+            <ion-icon class="icon-size" name="grid-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" *ngIf="canViewConsultants()">
+          <ion-item (click)="goTo('consultants')">
+            <span class="menu-item">Consultores</span>
+            <ion-icon class="icon-size" name="person-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
       </div>
-  
-      <div class="container-menu-item" >
-        <ion-item (click)="goTo('usuario-list')">
-          <span class="menu-item">Usuários</span>
-          <ion-icon class="icon-size" name="person-outline" slot="start"></ion-icon>
-        </ion-item>
+
+      <!-- Seção Financeiro -->
+      <div class="menu-section" *ngIf="canViewReports()">
+        <div class="section-title">
+          <span>FINANCEIRO</span>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('invoices')">
+            <span class="menu-item">Faturas</span>
+            <ion-icon class="icon-size" name="receipt-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('commissions')">
+            <span class="menu-item">Comissões</span>
+            <ion-icon class="icon-size" name="wallet-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('payments')">
+            <span class="menu-item">Pagamentos</span>
+            <ion-icon class="icon-size" name="card-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Seção Integrações -->
+      <div class="menu-section" *ngIf="canViewIntegrations() || canViewSocialMedia()">
+        <div class="section-title">
+          <span>INTEGRAÇÕES</span>
+        </div>
+
+        <!-- ERP & Sincronização - apenas para usuários com VIEW_INTEGRATIONS que NÃO sejam META_ANALYST -->
+        <div class="container-menu-item" *ngIf="canViewIntegrations() && !isMetaAnalyst()">
+          <ion-item (click)="goTo('erp')">
+            <span class="menu-item">ERP & Sincronização</span>
+            <ion-icon class="icon-size" name="server-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <!-- APIs & Webhooks - para todos com VIEW_INTEGRATIONS -->
+        <div class="container-menu-item" *ngIf="canViewIntegrations()">
+          <ion-item (click)="goTo('integrations')">
+            <span class="menu-item">APIs & Webhooks</span>
+            <ion-icon class="icon-size" name="link-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <!-- Automações - apenas para usuários com VIEW_INTEGRATIONS que NÃO sejam META_ANALYST -->
+        <div class="container-menu-item" *ngIf="canViewIntegrations() && !isMetaAnalyst()">
+          <ion-item (click)="goTo('automations')">
+            <span class="menu-item">Automações</span>
+            <ion-icon class="icon-size" name="flash-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <!-- Redes Sociais - para todos com VIEW_SOCIAL_MEDIA -->
+        <div class="container-menu-item" *ngIf="canViewSocialMedia()">
+          <ion-item (click)="goTo('social-media')">
+            <span class="menu-item">Redes Sociais</span>
+            <ion-icon class="icon-size" name="share-social-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Seção Suporte -->
+      <div class="menu-section" *ngIf="canViewReports()">
+        <div class="section-title">
+          <span>SUPORTE</span>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('support')">
+            <span class="menu-item">Tickets & FAQ</span>
+            <ion-icon class="icon-size" name="help-circle-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('knowledge-base')">
+            <span class="menu-item">Base Conhecimento</span>
+            <ion-icon class="icon-size" name="library-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+      </div>
+
+      <!-- Seção Administração -->
+      <div class="menu-section" *ngIf="canViewSettings()">
+        <div class="section-title">
+          <span>ADMINISTRAÇÃO</span>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('users')">
+            <span class="menu-item">Usuários</span>
+            <ion-icon class="icon-size" name="people-circle-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('roles')">
+            <span class="menu-item">Perfis & Permissões</span>
+            <ion-icon class="icon-size" name="shield-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('audit-logs')">
+            <span class="menu-item">Logs de Auditoria</span>
+            <ion-icon class="icon-size" name="document-text-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
+
+        <div class="container-menu-item" >
+          <ion-item (click)="goTo('settings')">
+            <span class="menu-item">Configurações</span>
+            <ion-icon class="icon-size" name="settings-outline" slot="start"></ion-icon>
+          </ion-item>
+        </div>
       </div>
   
     </div>

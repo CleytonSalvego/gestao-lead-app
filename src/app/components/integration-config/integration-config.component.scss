@@ -1,0 +1,308 @@
+.integration-config-content {
+  --background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-200) 100%);
+  
+  @media (prefers-color-scheme: dark) {
+    --background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+  }
+}
+
+.config-container {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.provider-info-card {
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .provider-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .provider-icon {
+      font-size: 3rem;
+      min-width: 48px;
+    }
+
+    .provider-details {
+      flex: 1;
+
+      h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+      }
+
+      p {
+        margin: 0 0 0.75rem 0;
+        color: var(--ion-color-medium);
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
+ion-card {
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  ion-card-header {
+    padding-bottom: 0.5rem;
+
+    ion-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      ion-icon {
+        font-size: 1.5rem;
+      }
+    }
+
+    ion-card-subtitle {
+      color: var(--ion-color-medium);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  }
+
+  ion-card-content {
+    padding-top: 1rem;
+  }
+}
+
+// Form Styling
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --border-width: 0 0 1px 0;
+  --border-color: var(--ion-color-step-150);
+  margin-bottom: 1rem;
+
+  &:last-child {
+    --border-width: 0;
+  }
+
+  ion-label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+
+    .required {
+      color: var(--ion-color-danger);
+      font-weight: 600;
+    }
+  }
+
+  ion-note {
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+    line-height: 1.3;
+  }
+
+  &.ion-invalid {
+    ion-input, ion-textarea, ion-select {
+      --border-color: var(--ion-color-danger);
+    }
+  }
+}
+
+.field-error {
+  font-size: 0.75rem;
+  margin: 0.25rem 0 0 0;
+  line-height: 1.2;
+}
+
+// Capabilities Section
+.permissions {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+// Test Results
+.test-results-card {
+  &.test-results-card {
+    border-left: 4px solid var(--ion-color-success);
+    
+    &.error {
+      border-left-color: var(--ion-color-danger);
+    }
+  }
+}
+
+.test-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.test-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ion-color-medium);
+  }
+
+  .value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+}
+
+.error-details {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  border-radius: 8px;
+  border-left: 4px solid var(--ion-color-danger);
+
+  h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--ion-color-danger);
+    font-size: 1rem;
+  }
+
+  .error-message {
+    margin: 0;
+    color: var(--ion-color-danger);
+    font-family: monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+}
+
+.test-details {
+  margin-top: 1rem;
+
+  h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--ion-color-dark);
+    font-size: 1rem;
+  }
+
+  ion-list {
+    background: transparent;
+    
+    ion-item {
+      --background: rgba(var(--ion-color-light-rgb), 0.3);
+      --border-radius: 8px;
+      margin-bottom: 0.5rem;
+
+      ion-label h3 {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      ion-label p {
+        font-size: 0.75rem;
+        color: var(--ion-color-medium);
+      }
+    }
+  }
+}
+
+// Footer
+ion-footer {
+  ion-toolbar {
+    --background: white;
+    --border-color: var(--ion-color-step-150);
+    --border-width: 1px 0 0 0;
+    
+    .footer-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      gap: 0.75rem;
+
+      .cancel-button {
+        flex-shrink: 0;
+      }
+
+      .test-button {
+        flex-shrink: 0;
+      }
+
+      .save-button {
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .config-container {
+    padding: 0.5rem;
+  }
+
+  .provider-header {
+    flex-direction: column;
+    text-align: center;
+    
+    .provider-icon {
+      font-size: 2.5rem;
+    }
+
+    .provider-details h2 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .test-info {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .footer-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    ion-button {
+      width: 100%;
+    }
+  }
+}
+
+// Dark Mode
+@media (prefers-color-scheme: dark) {
+  ion-card {
+    background: var(--ion-color-step-50);
+    border: 1px solid var(--ion-color-step-100);
+  }
+
+  .provider-info-card {
+    background: var(--ion-color-step-100);
+  }
+
+  ion-footer ion-toolbar {
+    --background: var(--ion-color-step-100);
+  }
+
+  .error-details {
+    background: rgba(var(--ion-color-danger-rgb), 0.2);
+  }
+}
+
+// Utility Classes
+.getCategoryLabel {
+  display: none; // This will be handled in TS
+}

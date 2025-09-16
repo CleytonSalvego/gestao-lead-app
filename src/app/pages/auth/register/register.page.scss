@@ -1,0 +1,122 @@
+.register-content {
+  --background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  
+  .register-container {
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .logo-section {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+
+      .logo-icon {
+        font-size: 2.5rem;
+        color: var(--ion-color-light);
+        margin-right: 0.5rem;
+      }
+
+      .logo-text {
+        color: var(--ion-color-light);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+      }
+    }
+
+    .subtitle {
+      color: var(--ion-color-light);
+      opacity: 0.9;
+      font-size: 1rem;
+      margin: 0;
+    }
+  }
+
+  .register-form {
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      .custom-item {
+        --background: rgba(255, 255, 255, 0.95);
+        --border-radius: 12px;
+        --border-width: 2px;
+        --border-color: transparent;
+        margin-bottom: 0.5rem;
+
+        &.ion-focused {
+          --border-color: var(--ion-color-primary);
+        }
+
+        .input-icon {
+          color: var(--ion-color-medium);
+          margin-right: 0.5rem;
+        }
+
+        .password-toggle {
+          --color: var(--ion-color-medium);
+        }
+      }
+
+      .error-message {
+        color: var(--ion-color-danger);
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .register-button {
+      --background: var(--ion-color-success);
+      --background-activated: var(--ion-color-success-shade);
+      --border-radius: 12px;
+      --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      height: 48px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+
+      &:hover {
+        --background: var(--ion-color-success-shade);
+      }
+    }
+  }
+
+  .login-section {
+    text-align: center;
+
+    .login-text {
+      color: var(--ion-color-light);
+      margin: 0;
+
+      .login-btn {
+        --color: var(--ion-color-light);
+        font-weight: 600;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .register-content .register-container {
+    padding: 1rem;
+  }
+}
+
+// Dark theme adjustments
+@media (prefers-color-scheme: dark) {
+  .register-content {
+    --background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+  }
+}

@@ -1,0 +1,36 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon Circle Border -->
+  <circle cx="30" cy="30" r="29" stroke="#3880ff" stroke-width="3" fill="rgba(56, 128, 255, 0.05)"/>
+  
+  <!-- Animated Dots -->
+  <circle cx="22" cy="30" r="5" fill="#3880ff">
+    <animate attributeName="r" values="5;6.5;5" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="30" cy="30" r="5" fill="url(#gradientDot)">
+    <animate attributeName="r" values="5;6.5;5" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="38" cy="30" r="5" fill="#10dc60">
+    <animate attributeName="r" values="5;6.5;5" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Text -->
+  <text x="75" y="25" font-family="Inter, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#2d3748">
+    Gestão
+  </text>
+  <text x="135" y="25" font-family="Inter, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#10dc60">
+    Lead
+  </text>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradientDot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3880ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10dc60;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

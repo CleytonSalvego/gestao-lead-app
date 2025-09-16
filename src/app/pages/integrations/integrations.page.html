@@ -1,0 +1,367 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-title-container">
+      <ion-title>APIs & Webhooks</ion-title>
+      <p class="toolbar-subtitle">Gerencie integrações e monitore logs de atividade</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="exportLogs()">
+        <ion-icon name="download" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Integrations Page Container -->
+  <div class="page-container">
+
+    <div class="integrations-content">
+      <!-- Stats Cards -->
+      <div class="stats-container">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.totalAPIs }}</div>
+              <div class="stat-label">APIs</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.totalWebhooks }}</div>
+              <div class="stat-label">Webhooks</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.todayCalls }}</div>
+              <div class="stat-label">Calls Hoje</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-value">{{ stats.avgResponseTime | number:'1.0-0' }}ms</div>
+              <div class="stat-label">Tempo Médio</div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Segment Navigation -->
+  <ion-segment [(ngModel)]="selectedSegment" color="primary">
+    <ion-segment-button value="overview">
+      <ion-icon name="analytics"></ion-icon>
+      <ion-label>Visão Geral</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="providers">
+      <ion-icon name="storefront"></ion-icon>
+      <ion-label>Provedores</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="configurations">
+      <ion-icon name="settings"></ion-icon>
+      <ion-label>Configurações</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="webhooks">
+      <ion-icon name="flash"></ion-icon>
+      <ion-label>Webhooks</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="logs">
+      <ion-icon name="list"></ion-icon>
+      <ion-label>Logs</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Overview Tab -->
+  <div *ngIf="selectedSegment === 'overview'" class="tab-content">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Resumo das Integrações</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="overview-stats">
+          <div class="stat-item">
+            <span class="label">APIs Ativas:</span>
+            <span class="value">{{ stats.activeAPIs }}/{{ stats.totalAPIs }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Webhooks Ativos:</span>
+            <span class="value">{{ stats.activeWebhooks }}/{{ stats.totalWebhooks }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Taxa de Erro:</span>
+            <span class="value">{{ stats.errorRate | number:'1.1-1' }}%</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Últimas Atividades</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let call of recentCalls">
+            <ion-icon 
+              [name]="call.success ? 'checkmark-circle' : 'close-circle'" 
+              [color]="call.success ? 'primary' : 'danger'"
+              slot="start">
+            </ion-icon>
+            <ion-label>
+              <h3>{{ call.method }} {{ call.endpoint }}</h3>
+              <p>{{ call.timestamp | date:'dd/MM/yyyy HH:mm' }}</p>
+              <p *ngIf="!call.success" class="error-text">{{ call.error }}</p>
+            </ion-label>
+            <div slot="end" class="call-details">
+              <ion-chip [color]="call.success ? 'primary' : 'danger'" size="small">
+                {{ call.statusCode }}
+              </ion-chip>
+              <div class="response-time">{{ call.responseTime }}ms</div>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Providers Tab -->
+  <div *ngIf="selectedSegment === 'providers'" class="tab-content">
+    <div class="providers-grid">
+      <ion-card *ngFor="let provider of providers" class="provider-card" (click)="configureProvider(provider)">
+        <ion-card-content>
+          <div class="provider-header">
+            <ion-icon [name]="provider.icon" [color]="provider.color" class="provider-icon"></ion-icon>
+            <div class="provider-info">
+              <h3>{{ provider.displayName }}</h3>
+              <ion-chip [color]="provider.color" size="small">
+                {{ getCategoryLabel(provider.category) }}
+              </ion-chip>
+            </div>
+            <div class="provider-status">
+              <ion-icon 
+                [name]="getProviderStatusIcon(provider.id)" 
+                [color]="getProviderStatusColor(provider.id)">
+              </ion-icon>
+            </div>
+          </div>
+          <p class="provider-description">{{ provider.description }}</p>
+          <div class="provider-capabilities">
+            <ion-chip 
+              *ngFor="let capability of provider.capabilities.slice(0, 3)" 
+              color="tertiary" 
+              size="small">
+              {{ capability.name }}
+            </ion-chip>
+            <ion-chip 
+              *ngIf="provider.capabilities.length > 3" 
+              color="light" 
+              size="small">
+              +{{ provider.capabilities.length - 3 }}
+            </ion-chip>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- Configurations Tab -->
+  <div *ngIf="selectedSegment === 'configurations'" class="tab-content">
+    <div class="tab-header">
+      <ion-button (click)="showProvidersModal()" color="primary">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Nova Integração
+      </ion-button>
+    </div>
+
+    <ion-card *ngFor="let config of configurations" class="config-card">
+      <ion-card-header>
+        <div class="config-header">
+          <div class="config-info">
+            <ion-card-title>{{ config.name }}</ion-card-title>
+            <ion-card-subtitle>{{ getProviderName(config.providerId) }}</ion-card-subtitle>
+          </div>
+          <div class="config-status">
+            <ion-chip [color]="getStatusColor(config.status)">
+              {{ getStatusText(config.status) }}
+            </ion-chip>
+          </div>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="config-details">
+          <div class="detail-row">
+            <span class="label">Recursos Ativos:</span>
+            <span class="value">{{ config.capabilities.length }}</span>
+          </div>
+          <div class="detail-row" *ngIf="config.lastTested">
+            <span class="label">Último Teste:</span>
+            <span class="value">{{ config.lastTested | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Atualizado:</span>
+            <span class="value">{{ config.updatedAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        
+        <div class="config-actions">
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="testIntegration(config)"
+            [disabled]="config.status === 'testing'">
+            <ion-icon name="pulse" slot="start"></ion-icon>
+            <span *ngIf="config.status !== 'testing'">Testar</span>
+            <span *ngIf="config.status === 'testing'">Testando...</span>
+          </ion-button>
+          
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="editConfiguration(config)">
+            <ion-icon name="settings" slot="start"></ion-icon>
+            Configurar
+          </ion-button>
+          
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            color="danger"
+            (click)="deleteConfiguration(config)">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    
+    <div *ngIf="configurations.length === 0" class="empty-state">
+      <ion-icon name="settings-outline"></ion-icon>
+      <h3>Nenhuma Integração Configurada</h3>
+      <p>Configure sua primeira integração para começar a capturar leads e dados de campanhas.</p>
+      <ion-button (click)="showProvidersModal()" color="primary">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Adicionar Integração
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Webhooks Tab -->
+  <div *ngIf="selectedSegment === 'webhooks'" class="tab-content">
+    <div class="tab-header">
+      <ion-button (click)="createWebhook()" color="primary">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Novo Webhook
+      </ion-button>
+    </div>
+
+    <ion-card *ngFor="let webhook of webhooks">
+      <ion-card-header>
+        <ion-card-title>{{ webhook.name }}</ion-card-title>
+        <ion-card-subtitle>{{ webhook.endpoint }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <p><strong>Eventos:</strong></p>
+              <div class="events-list">
+                <ion-chip *ngFor="let event of webhook.events" color="tertiary" size="small">
+                  {{ event }}
+                </ion-chip>
+              </div>
+            </ion-col>
+            <ion-col size="6">
+              <p><strong>Último Trigger:</strong> {{ webhook.lastTriggered | date:'dd/MM/yyyy HH:mm' }}</p>
+              <p><strong>Success Rate:</strong> {{ webhook.successRate | number:'1.1-1' }}%</p>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="12">
+              <p><strong>Total Triggers:</strong> {{ webhook.totalTriggers | number }}</p>
+              <p><strong>Status:</strong> 
+                <ion-chip [color]="getStatusColor(webhook.status)">
+                  {{ getStatusText(webhook.status) }}
+                </ion-chip>
+              </p>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-button 
+                fill="outline" 
+                size="small" 
+                (click)="testWebhook(webhook)"
+                [disabled]="webhook.status === 'error'">
+                <ion-icon name="flash" slot="start"></ion-icon>
+                Testar Webhook
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Logs Tab -->
+  <div *ngIf="selectedSegment === 'logs'" class="tab-content">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Logs de API</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let log of recentCalls">
+            <ion-label>
+              <h3>{{ log.method }} {{ log.endpoint }}</h3>
+              <p>Status: {{ log.statusCode }} | Tempo: {{ log.responseTime }}ms</p>
+              <p class="timestamp">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+              <p *ngIf="!log.success" class="error-text">{{ log.error }}</p>
+            </ion-label>
+            <div slot="end">
+              <ion-chip [color]="log.success ? 'primary' : 'danger'" size="small">
+                {{ log.success ? 'Sucesso' : 'Erro' }}
+              </ion-chip>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Logs de Webhook</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let log of recentWebhookLogs">
+            <ion-label>
+              <h3>{{ log.event }}</h3>
+              <p>Status: {{ log.statusCode }} | Tentativas: {{ log.attempts }}</p>
+              <p class="timestamp">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+              <p *ngIf="!log.success" class="error-text">{{ log.error }}</p>
+            </ion-label>
+            <div slot="end">
+              <ion-chip [color]="log.success ? 'primary' : 'danger'" size="small">
+                {{ log.success ? 'Sucesso' : 'Erro' }}
+              </ion-chip>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+    </div>
+    </div>
+  </div>
+</ion-content>

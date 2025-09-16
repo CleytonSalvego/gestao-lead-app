@@ -1,0 +1,167 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-title-container">
+      <ion-title>Dashboard</ion-title>
+      <p class="toolbar-subtitle">Aqui está um resumo das suas atividades hoje</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="doRefresh($event)">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Dashboard Page Container -->
+  <div class="page-container">
+
+  <div class="dashboard-container" *ngIf="!isLoading">
+
+    <!-- Quick Stats Cards -->
+    <div class="stats-grid">
+      <ion-card class="stat-card leads-card" (click)="navigateToLeads()">
+        <ion-card-content>
+          <div class="stat-header">
+            <ion-icon name="people-outline"></ion-icon>
+            <span class="stat-value">{{ metrics?.totalLeads || 0 }}</span>
+          </div>
+          <div class="stat-footer">
+            <h3>Total de Leads</h3>
+            <p>+{{ metrics?.todayLeads || 0 }} hoje</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="stat-card conversions-card">
+        <ion-card-content>
+          <div class="stat-header">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span class="stat-value">{{ metrics?.conversions || 0 }}</span>
+          </div>
+          <div class="stat-footer">
+            <h3>Conversões</h3>
+            <p>{{ formatPercentage(metrics?.conversionRate || 0) }} taxa</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="stat-card ticket-card">
+        <ion-card-content>
+          <div class="stat-header">
+            <ion-icon name="cash-outline"></ion-icon>
+            <span class="stat-value">{{ formatCurrency(metrics?.averageTicket || 0) }}</span>
+          </div>
+          <div class="stat-footer">
+            <h3>Ticket Médio</h3>
+            <p>Por venda</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="stat-card contact-card">
+        <ion-card-content>
+          <div class="stat-header">
+            <ion-icon name="call-outline"></ion-icon>
+            <span class="stat-value">{{ formatPercentage(metrics?.contactRate || 0) }}</span>
+          </div>
+          <div class="stat-footer">
+            <h3>Taxa de Contato</h3>
+            <p>Leads contactados</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <ion-card class="chart-card">
+        <ion-card-header>
+          <ion-card-title>Distribuição por Produto</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="chart-container">
+            <canvas #productChart></canvas>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="chart-card">
+        <ion-card-header>
+          <ion-card-title>Atendimentos IA vs Humanos</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="chart-container">
+            <canvas #contactChart></canvas>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Ações Rápidas</h2>
+      <div class="actions-grid">
+        <ion-card class="action-card" (click)="navigateToKanban()">
+          <ion-card-content>
+            <ion-icon name="grid-outline"></ion-icon>
+            <h3>Kanban</h3>
+            <p>Gerenciar pipeline</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="action-card" (click)="navigateToLeads()">
+          <ion-card-content>
+            <ion-icon name="person-add-outline"></ion-icon>
+            <h3>Novos Leads</h3>
+            <p>Visualizar leads</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="action-card" (click)="navigateToConsultants()">
+          <ion-card-content>
+            <ion-icon name="people-circle-outline"></ion-icon>
+            <h3>Consultores</h3>
+            <p>Gerenciar equipe</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="performers-section" *ngIf="topPerformers?.length">
+      <h2>Top Performers</h2>
+      <ion-card class="performers-card">
+        <ion-list>
+          <ion-item *ngFor="let performer of topPerformers; let i = index">
+            <ion-avatar slot="start">
+              <img [src]="performer.avatar" alt="{{ performer.name }}">
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ performer.name }}</h2>
+              <p>{{ formatPercentage(performer.kpis.goalProgress) }} da meta</p>
+            </ion-label>
+            <ion-badge slot="end" [color]="i === 0 ? 'primary' : i === 1 ? 'warning' : 'medium'">
+              #{{ i + 1 }}
+            </ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando dashboard...</p>
+  </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,327 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-title-container">
+      <ion-title>Suporte</ion-title>
+      <p class="toolbar-subtitle">Gerencie tickets, base de conhecimento e FAQ</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="help-circle" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="support-container">
+    <!-- Metrics Dashboard -->
+    <div *ngIf="metrics" class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value">{{ metrics.tickets.total }}</div>
+        <div class="metric-label">Total de Tickets</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">{{ metrics.tickets.open }}</div>
+        <div class="metric-label">Tickets Abertos</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">{{ metrics.sla.responseTime.average | number:'1.1-1' }}h</div>
+        <div class="metric-label">Tempo Médio Resposta</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">{{ metrics.sla.responseTime.percentage | number:'1.0-0' }}%</div>
+        <div class="metric-label">SLA Compliance</div>
+      </div>
+    </div>
+
+    <!-- Segment Tabs -->
+    <ion-segment value="tickets" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="tickets">
+        <ion-label>Tickets</ion-label>
+        <ion-icon name="document-text-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="knowledge">
+        <ion-label>Base de Conhecimento</ion-label>
+        <ion-icon name="library-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="faq">
+        <ion-label>FAQ</ion-label>
+        <ion-icon name="help-circle-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Tickets Section -->
+    <div *ngIf="selectedSegment === 'tickets'" class="content-section">
+      <div class="section-header">
+        <h2>Tickets de Suporte</h2>
+        <ion-button (click)="openTicketModal()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Novo Ticket
+        </ion-button>
+      </div>
+
+      <div class="tickets-list">
+        <ion-card *ngFor="let ticket of tickets" class="ticket-card">
+          <ion-card-header>
+            <div class="ticket-header">
+              <div class="ticket-info">
+                <h3>{{ ticket.title }}</h3>
+                <p>{{ getCategoryText(ticket.category) }} • {{ ticket.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+              </div>
+              <div class="ticket-badges">
+                <ion-chip [color]="getPriorityColor(ticket.priority)" size="small">
+                  {{ getPriorityText(ticket.priority) }}
+                </ion-chip>
+                <ion-chip [color]="getStatusColor(ticket.status)" size="small">
+                  {{ getStatusText(ticket.status) }}
+                </ion-chip>
+              </div>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p class="ticket-description">{{ ticket.description }}</p>
+            
+            <div class="ticket-actions">
+              <ion-button fill="clear" size="small" (click)="openTicketModal(ticket)">
+                <ion-icon name="create" slot="start"></ion-icon>
+                Editar
+              </ion-button>
+              
+              <ion-button fill="clear" size="small" *ngIf="ticket.status !== 'closed'" 
+                         (click)="changeTicketStatus(ticket, 'closed')">
+                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                Fechar
+              </ion-button>
+              
+              <ion-button fill="clear" size="small" color="danger" (click)="deleteTicket(ticket)">
+                <ion-icon name="trash" slot="start"></ion-icon>
+                Excluir
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Empty State for Tickets -->
+        <div *ngIf="tickets.length === 0" class="empty-state">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <h3>Nenhum ticket encontrado</h3>
+          <p>Crie seu primeiro ticket de suporte para começar.</p>
+          <ion-button (click)="openTicketModal()">
+            <ion-icon name="add" slot="start"></ion-icon>
+            Criar Ticket
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Knowledge Base Section -->
+    <div *ngIf="selectedSegment === 'knowledge'" class="content-section">
+      <div class="section-header">
+        <h2>Base de Conhecimento</h2>
+        <ion-button (click)="openArticleModal()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Novo Artigo
+        </ion-button>
+      </div>
+
+      <div class="articles-list">
+        <ion-card *ngFor="let article of knowledgeArticles" class="article-card">
+          <ion-card-header>
+            <div class="article-header">
+              <h3>{{ article.title }}</h3>
+              <div class="article-meta">
+                <span class="category">{{ article.category }}</span>
+                <span class="views">{{ article.views }} visualizações</span>
+              </div>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="article-content">
+              <p>{{ article.content | slice:0:200 }}...</p>
+            </div>
+
+            <div class="article-tags">
+              <ion-chip *ngFor="let tag of article.tags" size="small" outline>
+                {{ tag }}
+              </ion-chip>
+            </div>
+
+            <div class="article-footer">
+              <span class="author">Por {{ article.authorName }}</span>
+              <span class="date">{{ article.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Empty State for Articles -->
+        <div *ngIf="knowledgeArticles.length === 0" class="empty-state">
+          <ion-icon name="library-outline"></ion-icon>
+          <h3>Nenhum artigo encontrado</h3>
+          <p>Crie artigos para compartilhar conhecimento com a equipe.</p>
+          <ion-button (click)="openArticleModal()">
+            <ion-icon name="add" slot="start"></ion-icon>
+            Criar Artigo
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div *ngIf="selectedSegment === 'faq'" class="content-section">
+      <div class="section-header">
+        <h2>Perguntas Frequentes</h2>
+      </div>
+
+      <div class="faq-list">
+        <ion-card *ngFor="let faq of faqs" class="faq-card">
+          <ion-card-header>
+            <h3>{{ faq.question }}</h3>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ faq.answer }}</p>
+            <div class="faq-footer">
+              <span class="views">{{ faq.views }} visualizações</span>
+              <div class="helpful-buttons">
+                <ion-button fill="clear" size="small" color="primary">
+                  <ion-icon name="thumbs-up" slot="start"></ion-icon>
+                  {{ faq.helpful }}
+                </ion-button>
+                <ion-button fill="clear" size="small" color="danger">
+                  <ion-icon name="thumbs-down" slot="start"></ion-icon>
+                  {{ faq.notHelpful }}
+                </ion-button>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Empty State for FAQ -->
+        <div *ngIf="faqs.length === 0" class="empty-state">
+          <ion-icon name="help-circle-outline"></ion-icon>
+          <h3>Nenhuma pergunta frequente</h3>
+          <p>As perguntas mais comuns aparecerão aqui.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Modal -->
+  <ion-modal [isOpen]="showTicketModal" (didDismiss)="closeModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ selectedTicket ? 'Editar' : 'Novo' }} Ticket</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <form [formGroup]="ticketForm" class="ticket-form">
+          <ion-item>
+            <ion-label position="stacked">Título *</ion-label>
+            <ion-input formControlName="title" placeholder="Descreva brevemente o problema"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Categoria *</ion-label>
+            <ion-select formControlName="category" placeholder="Selecione a categoria">
+              <ion-select-option *ngFor="let category of ticketCategories" [value]="category.value">
+                {{ category.label }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Prioridade *</ion-label>
+            <ion-select formControlName="priority" placeholder="Selecione a prioridade">
+              <ion-select-option *ngFor="let priority of ticketPriorities" [value]="priority.value">
+                {{ priority.label }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Descrição *</ion-label>
+            <ion-textarea formControlName="description" 
+                         placeholder="Descreva detalhadamente o problema..."
+                         rows="6"></ion-textarea>
+          </ion-item>
+        </form>
+      </ion-content>
+
+      <ion-footer>
+        <ion-toolbar>
+          <ion-buttons slot="end">
+            <ion-button color="medium" (click)="closeModal()">Cancelar</ion-button>
+            <ion-button color="primary" (click)="saveTicket()">Salvar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-footer>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Article Modal -->
+  <ion-modal [isOpen]="showArticleModal" (didDismiss)="closeModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Novo Artigo</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <form [formGroup]="articleForm" class="article-form">
+          <ion-item>
+            <ion-label position="stacked">Título *</ion-label>
+            <ion-input formControlName="title" placeholder="Título do artigo"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Categoria *</ion-label>
+            <ion-select formControlName="category" placeholder="Selecione a categoria">
+              <ion-select-option *ngFor="let category of ticketCategories" [value]="category.value">
+                {{ category.label }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Tags</ion-label>
+            <ion-input formControlName="tags" placeholder="Tags separadas por vírgula"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Conteúdo *</ion-label>
+            <ion-textarea formControlName="content" 
+                         placeholder="Conteúdo do artigo..."
+                         rows="10"></ion-textarea>
+          </ion-item>
+        </form>
+      </ion-content>
+
+      <ion-footer>
+        <ion-toolbar>
+          <ion-buttons slot="end">
+            <ion-button color="medium" (click)="closeModal()">Cancelar</ion-button>
+            <ion-button color="primary" (click)="saveArticle()">Publicar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-footer>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

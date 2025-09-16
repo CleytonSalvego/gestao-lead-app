@@ -1,0 +1,28 @@
+<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon Circle Border -->
+  <circle cx="22" cy="22" r="21" stroke="#3880ff" stroke-width="2" fill="rgba(56, 128, 255, 0.05)"/>
+  
+  <!-- Animated Dots -->
+  <circle cx="16" cy="22" r="3" fill="#3880ff">
+    <animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="22" cy="22" r="3" fill="url(#gradientDot)">
+    <animate attributeName="r" values="3;4;3" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <circle cx="28" cy="22" r="3" fill="#10dc60">
+    <animate attributeName="r" values="3;4;3" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradientDot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3880ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10dc60;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,195 @@
+// Global background gradient for ion-content
+ion-content {
+  --background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-200) 100%);
+  
+  @media (prefers-color-scheme: dark) {
+    --background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+  }
+}
+
+// Toolbar styling
+ion-toolbar {
+  --background: white;
+  --color: #2c3e50;
+  --border-color: #e9ecef;
+  
+  .toolbar-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+    
+    ion-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .toolbar-subtitle {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.2;
+      font-weight: 400;
+    }
+  }
+}
+
+.stats-container {
+  padding: 16px;
+  
+  .stat-card {
+    margin: 0;
+    text-align: center;
+    
+    ion-card-content {
+      padding: 16px 8px;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--ion-color-primary);
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+      font-weight: 500;
+    }
+  }
+}
+
+ion-segment {
+  margin: 16px;
+  margin-bottom: 0;
+}
+
+.tab-content {
+  padding: 16px;
+  
+  .tab-header {
+    margin-bottom: 16px;
+    text-align: right;
+  }
+}
+
+.integration-info {
+  p {
+    margin: 8px 0;
+    
+    strong {
+      color: var(--ion-color-dark);
+    }
+  }
+}
+
+.financial-summary {
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ion-color-light);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .label {
+      font-weight: 500;
+      color: var(--ion-color-medium);
+    }
+    
+    .value {
+      font-weight: bold;
+      color: var(--ion-color-primary);
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.error-text {
+  color: var(--ion-color-danger) !important;
+  font-style: italic;
+}
+
+.erp-ref {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.commission-amount {
+  text-align: right;
+  
+  .amount {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--ion-color-success);
+    margin-bottom: 4px;
+  }
+}
+
+ion-card {
+  margin-bottom: 16px;
+  
+  ion-card-header {
+    padding-bottom: 8px;
+  }
+  
+  ion-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  ion-card-subtitle {
+    color: var(--ion-color-medium);
+    font-weight: 500;
+  }
+}
+
+ion-chip {
+  font-weight: 500;
+}
+
+ion-button {
+  --border-radius: 8px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .stats-container {
+    padding: 8px;
+    
+    .stat-card {
+      .stat-value {
+        font-size: 1.5rem;
+      }
+      
+      .stat-label {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+  .tab-content {
+    padding: 8px;
+  }
+  
+  ion-segment {
+    margin: 8px;
+    margin-bottom: 0;
+    
+    ion-segment-button {
+      font-size: 0.8rem;
+      
+      ion-icon {
+        font-size: 1rem;
+      }
+    }
+  }
+}

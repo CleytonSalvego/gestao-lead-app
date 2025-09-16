@@ -1,0 +1,42 @@
+// Toolbar styles
+ion-header {
+  ion-toolbar {
+    --background: white;
+    --color: #2c3e50;
+    --border-color: #e9ecef;
+    
+    .toolbar-title-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      flex: 1;
+      
+      ion-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .toolbar-subtitle {
+        margin: 0;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        line-height: 1.2;
+        font-weight: 400;
+      }
+    }
+    
+    ion-button {
+      --color: #6c757d;
+      
+      &:hover {
+        --color: #007bff;
+      }
+    }
+  }
+}
+
+.container {
+  padding: 1rem;
+}

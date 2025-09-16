@@ -1,0 +1,390 @@
+// Global background gradient for ion-content
+ion-content {
+  --background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-200) 100%);
+  
+  @media (prefers-color-scheme: dark) {
+    --background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+  }
+}
+
+// Toolbar styling
+ion-toolbar {
+  --background: white;
+  --color: #2c3e50;
+  --border-color: #e9ecef;
+  
+  .toolbar-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+    
+    ion-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .toolbar-subtitle {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.2;
+      font-weight: 400;
+    }
+  }
+}
+
+.support-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid var(--ion-color-step-200);
+
+  .metric-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--ion-color-primary);
+    margin-bottom: 4px;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    color: var(--ion-color-medium);
+    font-weight: 500;
+  }
+}
+
+ion-segment {
+  margin-bottom: 24px;
+  
+  ion-segment-button {
+    min-height: 48px;
+    
+    ion-label {
+      font-weight: 500;
+    }
+    
+    ion-icon {
+      margin-top: 4px;
+    }
+  }
+}
+
+.content-section {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      margin: 0;
+    }
+  }
+}
+
+// Tickets Styles
+.tickets-list {
+  .ticket-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .ticket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      .ticket-info {
+        flex: 1;
+
+        h3 {
+          margin: 0 0 4px 0;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: var(--ion-color-dark);
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--ion-color-medium);
+        }
+      }
+
+      .ticket-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+    }
+
+    .ticket-description {
+      margin: 16px 0;
+      line-height: 1.5;
+      color: var(--ion-color-dark);
+    }
+
+    .ticket-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ion-color-step-150);
+
+      ion-button {
+        --padding-start: 12px;
+        --padding-end: 12px;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+// Articles Styles
+.articles-list {
+  .article-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .article-header {
+      h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+      }
+
+      .article-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 0.875rem;
+
+        .category {
+          color: var(--ion-color-primary);
+          font-weight: 500;
+        }
+
+        .views {
+          color: var(--ion-color-medium);
+        }
+      }
+    }
+
+    .article-content {
+      margin: 16px 0;
+
+      p {
+        line-height: 1.6;
+        color: var(--ion-color-dark);
+      }
+    }
+
+    .article-tags {
+      margin: 16px 0;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .article-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+      color: var(--ion-color-medium);
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ion-color-step-150);
+
+      .author {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// FAQ Styles
+.faq-list {
+  .faq-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    p {
+      margin: 16px 0;
+      line-height: 1.6;
+      color: var(--ion-color-dark);
+    }
+
+    .faq-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ion-color-step-150);
+
+      .views {
+        font-size: 0.875rem;
+        color: var(--ion-color-medium);
+      }
+
+      .helpful-buttons {
+        display: flex;
+        gap: 8px;
+
+        ion-button {
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// Empty States
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ion-color-dark);
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// Forms
+.ticket-form,
+.article-form {
+  padding: 16px;
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 16px;
+
+    ion-label {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    ion-textarea {
+      --padding-top: 12px;
+      --padding-bottom: 12px;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .support-container {
+    padding: 12px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    ion-button {
+      width: 100%;
+    }
+  }
+
+  .ticket-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ticket-actions {
+    flex-direction: column;
+
+    ion-button {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  .article-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .faq-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    .helpful-buttons {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .metric-card {
+    background: var(--ion-color-step-100);
+    border-color: var(--ion-color-step-200);
+  }
+
+  .ticket-card,
+  .article-card,
+  .faq-card {
+    background: var(--ion-color-step-50);
+  }
+}

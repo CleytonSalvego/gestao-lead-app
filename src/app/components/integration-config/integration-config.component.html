@@ -1,0 +1,311 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEditing ? 'Editar' : 'Configurar' }} {{ provider.displayName }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="cancel()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="integration-config-content">
+  <div class="config-container">
+    
+    <!-- Provider Info -->
+    <ion-card class="provider-info-card">
+      <ion-card-content>
+        <div class="provider-header">
+          <ion-icon [name]="provider.icon" [color]="provider.color" class="provider-icon"></ion-icon>
+          <div class="provider-details">
+            <h2>{{ provider.displayName }}</h2>
+            <p>{{ provider.description }}</p>
+            <ion-chip [color]="provider.color" size="small">
+              {{ getCategoryLabel(provider.category) }}
+            </ion-chip>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <form [formGroup]="configForm" (ngSubmit)="save()">
+      
+      <!-- Basic Configuration -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Configuração Básica</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked">Nome da Integração *</ion-label>
+            <ion-input 
+              formControlName="name" 
+              placeholder="Ex: Facebook Produção"
+              [class.ion-invalid]="configForm.get('name')?.invalid && configForm.get('name')?.touched">
+            </ion-input>
+          </ion-item>
+          
+          <ion-text color="danger" *ngIf="configForm.get('name')?.invalid && configForm.get('name')?.touched">
+            <p>Nome é obrigatório</p>
+          </ion-text>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Dynamic Field Groups -->
+      <ion-card *ngFor="let groupKey of getGroupKeys()">
+        <ion-card-header>
+          <ion-card-title>{{ getGroupTitle(groupKey) }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          
+          <div *ngFor="let field of fieldGroups[groupKey]">
+            <div *ngIf="shouldShowField(field)">
+              
+              <!-- Text Input -->
+              <ion-item *ngIf="field.type === 'text' || field.type === 'url'">
+                <ion-label position="stacked">
+                  {{ field.label }}
+                  <span *ngIf="field.required" class="required">*</span>
+                </ion-label>
+                <ion-input 
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder"
+                  [class.ion-invalid]="isFieldInvalid(field)">
+                </ion-input>
+                <ion-note slot="helper" *ngIf="field.description">
+                  {{ field.description }}
+                </ion-note>
+              </ion-item>
+
+              <!-- Password Input -->
+              <ion-item *ngIf="field.type === 'password'">
+                <ion-label position="stacked">
+                  {{ field.label }}
+                  <span *ngIf="field.required" class="required">*</span>
+                </ion-label>
+                <ion-input 
+                  type="password"
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder"
+                  [class.ion-invalid]="isFieldInvalid(field)">
+                </ion-input>
+                <ion-note slot="helper" *ngIf="field.description">
+                  {{ field.description }}
+                </ion-note>
+              </ion-item>
+
+              <!-- Textarea -->
+              <ion-item *ngIf="field.type === 'textarea'">
+                <ion-label position="stacked">
+                  {{ field.label }}
+                  <span *ngIf="field.required" class="required">*</span>
+                </ion-label>
+                <ion-textarea 
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder"
+                  [class.ion-invalid]="isFieldInvalid(field)"
+                  rows="3">
+                </ion-textarea>
+                <ion-note slot="helper" *ngIf="field.description">
+                  {{ field.description }}
+                </ion-note>
+              </ion-item>
+
+              <!-- Number Input -->
+              <ion-item *ngIf="field.type === 'number'">
+                <ion-label position="stacked">
+                  {{ field.label }}
+                  <span *ngIf="field.required" class="required">*</span>
+                </ion-label>
+                <ion-input 
+                  type="number"
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder"
+                  [class.ion-invalid]="isFieldInvalid(field)">
+                </ion-input>
+                <ion-note slot="helper" *ngIf="field.description">
+                  {{ field.description }}
+                </ion-note>
+              </ion-item>
+
+              <!-- Select -->
+              <ion-item *ngIf="field.type === 'select'">
+                <ion-label position="stacked">
+                  {{ field.label }}
+                  <span *ngIf="field.required" class="required">*</span>
+                </ion-label>
+                <ion-select 
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder"
+                  interface="popover">
+                  <ion-select-option 
+                    *ngFor="let option of field.options" 
+                    [value]="option.value">
+                    {{ option.label }}
+                  </ion-select-option>
+                </ion-select>
+                <ion-note slot="helper" *ngIf="field.description">
+                  {{ field.description }}
+                </ion-note>
+              </ion-item>
+
+              <!-- Boolean Toggle -->
+              <ion-item *ngIf="field.type === 'boolean'">
+                <ion-label>
+                  {{ field.label }}
+                  <p *ngIf="field.description">{{ field.description }}</p>
+                </ion-label>
+                <ion-toggle 
+                  [formControlName]="field.name"
+                  slot="end">
+                </ion-toggle>
+              </ion-item>
+
+              <!-- Field Error Message -->
+              <ion-text color="danger" *ngIf="isFieldInvalid(field)">
+                <p class="field-error">{{ getFieldErrorMessage(field) }}</p>
+              </ion-text>
+
+            </div>
+          </div>
+          
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Capabilities -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Recursos Disponíveis</ion-card-title>
+          <ion-card-subtitle>Selecione os recursos que deseja ativar nesta integração</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          
+          <ion-item *ngFor="let capability of provider.capabilities">
+            <ion-checkbox 
+              slot="start"
+              [checked]="isCapabilityEnabled(capability.id)"
+              (ionChange)="onCapabilityChange(capability.id, $event)">
+            </ion-checkbox>
+            <ion-label>
+              <h3>{{ capability.name }}</h3>
+              <p>{{ capability.description }}</p>
+              <div *ngIf="capability.permissions" class="permissions">
+                <ion-chip 
+                  *ngFor="let permission of capability.permissions" 
+                  color="tertiary" 
+                  size="small">
+                  {{ permission }}
+                </ion-chip>
+              </div>
+            </ion-label>
+          </ion-item>
+          
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Test Results -->
+      <ion-card *ngIf="testResult" class="test-results-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon 
+              [name]="testResult.success ? 'checkmark-circle' : 'close-circle'"
+              [color]="testResult.success ? 'success' : 'danger'">
+            </ion-icon>
+            Resultado do Teste
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          
+          <div class="test-info">
+            <div class="test-metric">
+              <span class="label">Status:</span>
+              <ion-chip [color]="testResult.success ? 'success' : 'danger'">
+                {{ testResult.success ? 'Sucesso' : 'Falha' }}
+              </ion-chip>
+            </div>
+            
+            <div class="test-metric">
+              <span class="label">Tempo de Resposta:</span>
+              <span class="value">{{ testResult.responseTime | number:'1.0-0' }}ms</span>
+            </div>
+            
+            <div class="test-metric" *ngIf="testResult.statusCode">
+              <span class="label">Status Code:</span>
+              <span class="value">{{ testResult.statusCode }}</span>
+            </div>
+            
+            <div class="test-metric">
+              <span class="label">Data do Teste:</span>
+              <span class="value">{{ testResult.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+            </div>
+          </div>
+          
+          <div *ngIf="!testResult.success && testResult.error" class="error-details">
+            <h4>Detalhes do Erro:</h4>
+            <p class="error-message">{{ testResult.error }}</p>
+          </div>
+          
+          <div *ngIf="testResult.details" class="test-details">
+            <h4>Detalhes Adicionais:</h4>
+            <ion-list>
+              <ion-item *ngFor="let detail of getTestDetailsArray(testResult.details)">
+                <ion-label>
+                  <h3>{{ detail.key }}</h3>
+                  <p>{{ detail.value }}</p>
+                </ion-label>
+                <ion-icon 
+                  *ngIf="detail.value === true"
+                  name="checkmark-circle" 
+                  color="success" 
+                  slot="end">
+                </ion-icon>
+                <ion-icon 
+                  *ngIf="detail.value === false"
+                  name="close-circle" 
+                  color="danger" 
+                  slot="end">
+                </ion-icon>
+              </ion-item>
+            </ion-list>
+          </div>
+          
+        </ion-card-content>
+      </ion-card>
+
+    </form>
+
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <div class="footer-buttons">
+      <ion-button 
+        fill="outline" 
+        (click)="cancel()"
+        class="cancel-button">
+        Cancelar
+      </ion-button>
+      
+      <ion-button 
+        fill="outline" 
+        (click)="testConnection()" 
+        [disabled]="configForm.invalid || isTesting"
+        color="tertiary"
+        class="test-button">
+        <ion-icon name="pulse" slot="start"></ion-icon>
+        <span *ngIf="!isTesting">Testar Conexão</span>
+        <span *ngIf="isTesting">Testando...</span>
+      </ion-button>
+      
+      <ion-button 
+        (click)="save()" 
+        [disabled]="configForm.invalid"
+        color="primary"
+        class="save-button">
+        <ion-icon name="save" slot="start"></ion-icon>
+        Salvar
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

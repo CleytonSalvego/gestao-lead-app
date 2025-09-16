@@ -1,0 +1,41 @@
+<div class="transition-overlay" [class.active]="show">
+  <div class="transition-content">
+    <!-- Logo with dots animation -->
+    <div class="logo-container">
+      <div class="logo-background">
+        <!-- Use our new logo with animated dots -->
+        <div class="logo-circle">
+          <div class="animated-dots">
+            <div class="dot dot-1"></div>
+            <div class="dot dot-2"></div>
+            <div class="dot dot-3"></div>
+          </div>
+        </div>
+      </div>
+      <div class="logo-decoration"></div>
+    </div>
+
+    <!-- Loading message -->
+    <div class="message-content">
+      <p class="loading-text">{{ message }}</p>
+    </div>
+
+    <!-- Progress dots -->
+    <div class="progress-section">
+      <div class="progress-dots">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot active"></div>
+        <div class="progress-dot active"></div>
+        <div class="progress-dot loading"></div>
+        <div class="progress-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background decoration -->
+  <div class="background-decoration">
+    <div class="floating-circle circle-1"></div>
+    <div class="floating-circle circle-2"></div>
+    <div class="floating-circle circle-3"></div>
+  </div>
+</div>

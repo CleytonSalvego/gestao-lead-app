@@ -4,10 +4,13 @@ import { Router } from '@angular/router';
 import { IonicModule, MenuController, NavController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
+import { AuthService as MockAuthService } from 'src/app/services/mock/auth.service';
 import { ControllService } from 'src/app/services/controller.service';
+import { PageTransitionService } from 'src/app/services/page-transition.service';
 import { SharedService } from 'src/app/services/shared.service';
 import { UserService } from 'src/app/services/user.service';
 import { VersionService } from 'src/app/services/version.service';
+import { Permission, User } from 'src/app/interfaces/auth.interface';
 
 @Component({
   selector: 'app-side-menu',
@@ -28,7 +31,8 @@ export class SideMenuComponent  implements OnInit {
   themeToggle = false;
   currentTheme: string = 'ligth';
   isAndroid: boolean = true;
-  dados: any = "";
+  dados: any = {};
+  currentUser: User | null = null;
 
   constructor(
     private platform: Platform,
@@ -39,7 +43,9 @@ export class SideMenuComponent  implements OnInit {
     private navCtrl: NavController,
     private menuCtrl: MenuController,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private mockAuthService: MockAuthService,
+    private pageTransitionService: PageTransitionService
   ) { }
 
   async ngOnInit() {
@@ -55,10 +61,48 @@ export class SideMenuComponent  implements OnInit {
   }
 
   async getRoleUser() {
-    this.subscription = await this.authService.emitLoginUser.subscribe(async (admin: any) => {
-      this.dados.admin = admin;
-      //this.subscription.unsubscribe();
+    // Updated to use new auth service pattern
+    this.subscription = this.mockAuthService.currentUser$.subscribe(async (user: User | null) => {
+      this.currentUser = user;
+      this.dados.admin = user?.role === 'admin';
     });
+  }
+
+  // Helper methods for checking permissions
+  hasPermission(permission: Permission): boolean {
+    return this.mockAuthService.hasPermission(permission);
+  }
+
+  canViewDashboard(): boolean {
+    return this.hasPermission(Permission.VIEW_DASHBOARD);
+  }
+
+  canViewLeads(): boolean {
+    return this.hasPermission(Permission.MANAGE_LEADS);
+  }
+
+  canViewConsultants(): boolean {
+    return this.hasPermission(Permission.MANAGE_CONSULTANTS);
+  }
+
+  canViewReports(): boolean {
+    return this.hasPermission(Permission.VIEW_REPORTS);
+  }
+
+  canViewSettings(): boolean {
+    return this.hasPermission(Permission.MANAGE_SETTINGS);
+  }
+
+  canViewIntegrations(): boolean {
+    return this.hasPermission(Permission.VIEW_INTEGRATIONS);
+  }
+
+  canViewSocialMedia(): boolean {
+    return this.hasPermission(Permission.VIEW_SOCIAL_MEDIA);
+  }
+
+  isMetaAnalyst(): boolean {
+    return this.currentUser?.role === 'meta_analyst';
   }
 
 
@@ -71,9 +115,11 @@ export class SideMenuComponent  implements OnInit {
   }
 
   goToHome() {
-    this.navCtrl.setDirection('root');
-    this.router.navigateByUrl('home');
+    // Close menu first
     this.menuCtrl.toggle();
+    
+    // Navigate with transition animation
+    this.pageTransitionService.navigateWithTransition('/dashboard', 'Carregando início...');
   }
 
   async logout() {
@@ -89,8 +135,11 @@ export class SideMenuComponent  implements OnInit {
   }
 
   goTo(pagina: string){
-    this.controllerService.navigate(pagina);
+    // Close menu first
     this.menuCtrl.toggle();
+    
+    // Navigate with transition animation
+    this.pageTransitionService.quickTransition(pagina);
   }
 
 

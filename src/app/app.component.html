@@ -1,8 +1,11 @@
 <ion-app>
+  <jeep-sqlite autoSave="true"></jeep-sqlite>
+  <app-side-menu></app-side-menu>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
 
-  <app-header id="menuHeader" class="hiddenMenu" [title]="''"></app-header>
-  <ion-content id="content">
-    <ion-router-outlet id="router"></ion-router-outlet>
-  </ion-content>
-
+  <!-- Page Transition Animation -->
+  <app-page-transition
+    [show]="transitionState.show"
+    [message]="transitionState.message">
+  </app-page-transition>
 </ion-app>

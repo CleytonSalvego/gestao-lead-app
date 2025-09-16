@@ -1,0 +1,26 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="toolbar-title-container">
+      <ion-title>Base de Conhecimento</ion-title>
+      <p class="toolbar-subtitle">Centro de aprendizado e documentação</p>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="search" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <app-coming-soon
+    title="Base de Conhecimento"
+    subtitle="Centro de aprendizado e documentação"
+    description="Acesse tutoriais, guias, FAQs e documentação completa. Tudo que você precisa para dominar o sistema."
+    icon="library-outline"
+    iconColor="dark">
+  </app-coming-soon>
+</ion-content>
