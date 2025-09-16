@@ -13,6 +13,8 @@ import {
 } from '../../interfaces/integration.interface';
 import { IntegrationsService } from '../../services/integrations/integrations.service';
 import { IntegrationConfigComponent } from '../../components/integration-config/integration-config.component';
+import { AutoIntegrationService } from '../../services/auto-integration.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-integrations',
@@ -49,7 +51,8 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     private integrationsService: IntegrationsService,
     private modalController: ModalController,
     private alertController: AlertController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private autoIntegrationService: AutoIntegrationService
   ) {}
 
   ngOnInit() {
@@ -73,7 +76,12 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     this.integrationsService.getConfigurations()
       .pipe(takeUntil(this.destroy$))
       .subscribe(configs => {
-        this.configurations = configs;
+        // Remove duplicates based on ID
+        const uniqueConfigs = configs.filter((config, index, self) =>
+          index === self.findIndex((c) => c.id === config.id)
+        );
+        console.log('📋 Configurações carregadas:', configs.length, '/ Únicas:', uniqueConfigs.length);
+        this.configurations = uniqueConfigs;
       });
 
     // Load webhooks
@@ -350,6 +358,174 @@ export class IntegrationsPage implements OnInit, OnDestroy {
       case 'error': return 'Erro';
       case 'testing': return 'Testando';
       default: return 'Desconhecido';
+    }
+  }
+
+  async forceCreateIntegration() {
+    console.log('🔧 BOTÃO CLICADO - COMEÇANDO...');
+
+    try {
+      console.log('📋 Configurações atuais:', this.configurations.length);
+
+      // Pular verificação e ir direto para criação
+      console.log('💾 CRIANDO INTEGRAÇÃO DIRETAMENTE...');
+
+      // Criar configuração usando o DatabaseService diretamente
+      const newIntegration = {
+        id: `integration_${Date.now()}`,
+        name: `Facebook Debug ${Date.now()}`,
+        type: 'facebook' as const,
+        status: 'active' as const,
+        configuration: {
+          appId: environment.facebook.appId || '722085609076707',
+          appSecret: environment.facebook.appSecret || '045f9424e3d03a7dc02c8ca468edfa72',
+          accessToken: environment.facebook.accessToken || 'dd03a6d9346805abffd989d966ece52d',
+          businessManagerId: environment.facebook.businessManagerId || '630140316714253',
+          pageId: environment.facebook.pageId || '579080491964703',
+          instagramAccountId: environment.facebook.instagramAccountId || '17841474874248436',
+          environment: 'production',
+          isActive: true,
+          autoSync: false
+        },
+        metadata: {
+          providerId: 'facebook',
+          capabilities: ['instagram_media', 'lead_retrieval']
+        }
+      };
+
+      console.log('💾 SALVANDO NO BANCO DIRETAMENTE...');
+
+      // Usar o DatabaseService diretamente
+      const savedIntegration = await (this.integrationsService as any).databaseService.createIntegration(newIntegration);
+
+      console.log('✅ INTEGRAÇÃO SALVA:', savedIntegration);
+
+      // Adicionar à lista local
+      const newConfig = {
+        id: savedIntegration.id,
+        providerId: 'facebook',
+        name: savedIntegration.name,
+        status: savedIntegration.status,
+        config: savedIntegration.configuration,
+        capabilities: savedIntegration.metadata?.capabilities || [],
+        createdAt: savedIntegration.createdAt,
+        updatedAt: savedIntegration.updatedAt
+      };
+
+      this.configurations.push(newConfig);
+      console.log('✅ CONFIGURAÇÃO ADICIONADA À LISTA LOCAL');
+
+      // Também adicionar ao BehaviorSubject do service para que o teste funcione
+      const serviceConfigurations = (this.integrationsService as any).configurations$.value;
+      serviceConfigurations.push(newConfig);
+      (this.integrationsService as any).configurations$.next([...serviceConfigurations]);
+      console.log('✅ CONFIGURAÇÃO ADICIONADA AO SERVICE');
+
+      console.log('📊 Total de configurações:', this.configurations.length);
+
+    } catch (error: any) {
+      console.error('❌ ERRO COMPLETO:', error);
+      console.error('❌ Stack:', error.stack);
+    }
+  }
+
+  async testRealFacebookAPI() {
+    try {
+      console.log('🌐 TESTANDO API REAL DO FACEBOOK...');
+
+      const loading = await this.loadingController.create({
+        message: 'Testando API real do Facebook...'
+      });
+      await loading.present();
+
+      // Usar token das variáveis de ambiente
+      const testToken = environment.facebook.accessToken || 'SEU_ACCESS_TOKEN_VALIDO_AQUI';
+
+      // Fazer chamada direta para a API do Facebook
+      const testUrl = `https://graph.facebook.com/v18.0/me?access_token=${testToken}&fields=id,name`;
+
+      console.log('🔗 URL de teste:', testUrl);
+
+      try {
+        const response = await fetch(testUrl);
+        const data = await response.json();
+
+        await loading.dismiss();
+
+        console.log('📊 RESPOSTA DA API:', data);
+
+        if (data.error) {
+          // Erro da API do Facebook
+          const alert = await this.alertController.create({
+            header: 'Erro da API Facebook',
+            message: `${data.error.message} (Código: ${data.error.code})`,
+            buttons: ['OK']
+          });
+          await alert.present();
+        } else {
+          // Sucesso
+          const alert = await this.alertController.create({
+            header: 'API Facebook Funcionando!',
+            message: `Conectado como: ${data.name} (ID: ${data.id})`,
+            buttons: ['OK']
+          });
+          await alert.present();
+        }
+
+      } catch (networkError: any) {
+        await loading.dismiss();
+        console.error('❌ Erro de rede:', networkError);
+
+        let errorMessage = 'Erro de conexão com a API do Facebook';
+        if (networkError.name === 'TypeError' && networkError.message.includes('CORS')) {
+          errorMessage = 'Erro CORS - As chamadas diretas para a API do Facebook podem ser bloqueadas pelo navegador. Use um proxy ou backend.';
+        }
+
+        const alert = await this.alertController.create({
+          header: 'Erro de Conexão',
+          message: errorMessage,
+          buttons: ['OK']
+        });
+        await alert.present();
+      }
+
+    } catch (error: any) {
+      console.error('❌ ERRO GERAL:', error);
+    }
+  }
+
+  async resetAndRecreate() {
+    try {
+      console.log('🔄 RESETANDO TUDO E RECRIANDO...');
+
+      // Limpar localStorage
+      localStorage.removeItem('auto_integration_created');
+      localStorage.removeItem('facebook_default_config');
+      console.log('🗑️ localStorage limpo');
+
+      // Limpar arrays locais
+      this.configurations = [];
+      console.log('📋 Array local limpo');
+
+      // Limpar service
+      (this.integrationsService as any).configurations$.next([]);
+      console.log('🔄 Service limpo');
+
+      // Aguardar um pouco
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Forçar recriação
+      console.log('🚀 Forçando recriação...');
+      await this.autoIntegrationService.forceCreateConfiguration();
+
+      // Recarregar dados
+      console.log('🔄 Recarregando dados...');
+      this.loadData();
+
+      console.log('✅ RESET E RECRIAÇÃO COMPLETOS!');
+
+    } catch (error: any) {
+      console.error('❌ ERRO NO RESET:', error);
     }
   }
 }

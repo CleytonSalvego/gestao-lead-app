@@ -1,0 +1,11 @@
+{
+  "/api/facebook/*": {
+    "target": "https://graph.facebook.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api/facebook": ""
+    }
+  }
+}

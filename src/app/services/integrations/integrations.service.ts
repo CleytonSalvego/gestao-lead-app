@@ -145,7 +145,7 @@ export class IntegrationsService {
 
   private testFacebookIntegration(config: IntegrationConfiguration): Observable<IntegrationTestResult> {
     const fbConfig = config.config as FacebookIntegrationConfig;
-    
+
     if (!fbConfig.appId || !fbConfig.accessToken) {
       return of({
         success: false,
@@ -155,19 +155,219 @@ export class IntegrationsService {
       });
     }
 
-    // Simulate Facebook Graph API call
-    return of({
-      success: true,
-      timestamp: new Date(),
-      responseTime: Math.random() * 1000 + 200,
-      statusCode: 200,
-      details: {
-        tokenValid: true,
-        permissions: fbConfig.permissions,
-        pageConnected: !!fbConfig.pageId,
-        adAccountConnected: !!fbConfig.adAccountId
+    const startTime = Date.now();
+
+    // Use fetch directly to avoid CORS issues with HttpClient
+    return this.testFacebookWithFetch(fbConfig).pipe(
+      map(result => ({
+        ...result,
+        timestamp: new Date(),
+        responseTime: Date.now() - startTime
+      })),
+      catchError(error => {
+        console.error('Facebook test error:', error);
+        return of({
+          success: false,
+          timestamp: new Date(),
+          responseTime: Date.now() - startTime,
+          statusCode: error.status || 0,
+          error: this.getFacebookErrorMessage(error)
+        });
+      })
+    );
+  }
+
+  private testFacebookWithFetch(fbConfig: any): Observable<IntegrationTestResult> {
+    return new Observable(observer => {
+      this.performFacebookFetchTest(fbConfig)
+        .then(result => {
+          observer.next(result);
+          observer.complete();
+        })
+        .catch(error => {
+          observer.error(error);
+        });
+    });
+  }
+
+  private async performFacebookFetchTest(fbConfig: any): Promise<IntegrationTestResult> {
+    const accessToken = fbConfig.accessToken;
+    const baseUrl = 'https://graph.facebook.com/v18.0';
+
+    try {
+      // Test 1: Verify access token by getting user info
+      const userTestUrl = `${baseUrl}/me?access_token=${accessToken}&fields=id,name`;
+      const userResponse = await fetch(userTestUrl);
+
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json();
+        throw new Error(errorData.error?.message || 'Failed to verify token');
       }
-    }).pipe(delay(1000));
+
+      const userData = await userResponse.json();
+      console.log('✅ User data:', userData);
+
+      // Test 2: Check permissions
+      const permissionsUrl = `${baseUrl}/me/permissions?access_token=${accessToken}`;
+      const permissionsResponse = await fetch(permissionsUrl);
+      const permissionsData = await permissionsResponse.json();
+
+      console.log('✅ Permissions data:', permissionsData);
+
+      let pageData = null;
+      let instagramData = null;
+
+      // Test 3: Test page access if pageId is provided
+      if (fbConfig.pageId) {
+        try {
+          const pageUrl = `${baseUrl}/${fbConfig.pageId}?access_token=${accessToken}&fields=id,name,access_token`;
+          const pageResponse = await fetch(pageUrl);
+          if (pageResponse.ok) {
+            pageData = await pageResponse.json();
+            console.log('✅ Page data:', pageData);
+          }
+        } catch (pageError) {
+          console.log('⚠️ Page not accessible:', pageError);
+        }
+      }
+
+      // Test 4: Test Instagram account if provided
+      if (fbConfig.instagramAccountId) {
+        try {
+          const instagramUrl = `${baseUrl}/${fbConfig.instagramAccountId}?access_token=${accessToken}&fields=id,username`;
+          const instagramResponse = await fetch(instagramUrl);
+          if (instagramResponse.ok) {
+            instagramData = await instagramResponse.json();
+            console.log('✅ Instagram data:', instagramData);
+          }
+        } catch (instagramError) {
+          console.log('⚠️ Instagram not accessible:', instagramError);
+        }
+      }
+
+      return this.buildSuccessResult(userData, permissionsData, pageData, instagramData, fbConfig);
+
+    } catch (error) {
+      console.error('Facebook API test failed:', error);
+      throw error;
+    }
+  }
+
+  private testFacebookGraphAPI(fbConfig: any): Observable<IntegrationTestResult> {
+    const accessToken = fbConfig.accessToken;
+
+    // Always use direct API - CORS issues will be handled by browser/interceptor
+    const baseUrl = 'https://graph.facebook.com/v18.0';
+
+    // Test 1: Verify access token by getting user info
+    const userTestUrl = `${baseUrl}/me?access_token=${accessToken}&fields=id,name`;
+
+    return this.http.get<any>(userTestUrl).pipe(
+      switchMap(userResponse => {
+        // Test 2: Check permissions
+        const permissionsUrl = `${baseUrl}/me/permissions?access_token=${accessToken}`;
+
+        return this.http.get<any>(permissionsUrl).pipe(
+          switchMap(permissionsResponse => {
+            // Test 3: Test page access if pageId is provided
+            if (fbConfig.pageId) {
+              const pageUrl = `${baseUrl}/${fbConfig.pageId}?access_token=${accessToken}&fields=id,name,access_token`;
+
+              return this.http.get<any>(pageUrl).pipe(
+                switchMap(pageResponse => {
+                  // Test 4: Test Instagram account if provided
+                  if (fbConfig.instagramAccountId) {
+                    const instagramUrl = `${baseUrl}/${fbConfig.instagramAccountId}?access_token=${accessToken}&fields=id,username`;
+
+                    return this.http.get<any>(instagramUrl).pipe(
+                      map(instagramResponse => this.buildSuccessResult(userResponse, permissionsResponse, pageResponse, instagramResponse, fbConfig)),
+                      catchError(instagramError => of(this.buildSuccessResult(userResponse, permissionsResponse, pageResponse, null, fbConfig, 'Instagram account not accessible')))
+                    );
+                  } else {
+                    return of(this.buildSuccessResult(userResponse, permissionsResponse, pageResponse, null, fbConfig));
+                  }
+                }),
+                catchError(pageError => of(this.buildSuccessResult(userResponse, permissionsResponse, null, null, fbConfig, 'Page not accessible')))
+              );
+            } else {
+              return of(this.buildSuccessResult(userResponse, permissionsResponse, null, null, fbConfig));
+            }
+          })
+        );
+      })
+    );
+  }
+
+  private buildSuccessResult(userResponse: any, permissionsResponse: any, pageResponse?: any, instagramResponse?: any, fbConfig?: any, warning?: string): IntegrationTestResult {
+    const permissions = permissionsResponse.data?.map((p: any) => p.permission) || [];
+    const grantedPermissions = permissionsResponse.data?.filter((p: any) => p.status === 'granted').map((p: any) => p.permission) || [];
+
+    return {
+      success: true,
+      statusCode: 200,
+      timestamp: new Date(),
+      responseTime: 0, // Will be set by caller
+      details: {
+        user: {
+          id: userResponse.id,
+          name: userResponse.name
+        },
+        tokenValid: true,
+        permissions: permissions,
+        grantedPermissions: grantedPermissions,
+        pageConnected: !!pageResponse,
+        pageInfo: pageResponse ? {
+          id: pageResponse.id,
+          name: pageResponse.name,
+          hasPageToken: !!pageResponse.access_token
+        } : null,
+        instagramConnected: !!instagramResponse,
+        instagramInfo: instagramResponse ? {
+          id: instagramResponse.id,
+          username: instagramResponse.username
+        } : null,
+        businessManagerId: fbConfig?.businessManagerId || null,
+        appId: fbConfig?.appId,
+        warning: warning
+      }
+    };
+  }
+
+  private getFacebookErrorMessage(error: any): string {
+    // Handle fetch errors
+    if (error.message) {
+      if (error.message.includes('CORS')) {
+        return 'Erro CORS - Configure o proxy ou use um backend para acessar a API do Facebook';
+      }
+      if (error.message.includes('Failed to fetch')) {
+        return 'Erro de rede - Verifique sua conexão com a internet';
+      }
+      return error.message;
+    }
+
+    // Handle HTTP errors
+    if (error.error?.error?.message) {
+      return `Facebook API Error: ${error.error.error.message}`;
+    }
+
+    switch (error.status) {
+      case 0:
+        return 'Erro CORS ou de rede - Verifique a configuração do proxy';
+      case 400:
+        return 'Bad Request - Verifique os parâmetros da requisição';
+      case 401:
+        return 'Token de acesso inválido ou expirado';
+      case 403:
+        return 'Acesso negado - Verifique as permissões do token';
+      case 404:
+        return 'Recurso não encontrado - Verifique os IDs fornecidos';
+      case 429:
+        return 'Rate limit excedido - Tente novamente mais tarde';
+      case 500:
+        return 'Erro interno do Facebook - Tente novamente mais tarde';
+      default:
+        return error.message || 'Erro desconhecido na API do Facebook';
+    }
   }
 
   private testGoogleAdsIntegration(config: IntegrationConfiguration): Observable<IntegrationTestResult> {
@@ -528,6 +728,7 @@ export class IntegrationsService {
   private async loadConfigurationsFromDatabase(): Promise<IntegrationConfiguration[]> {
     try {
       const dbIntegrations = await this.databaseService.getIntegrations();
+      console.log('🔄 [IntegrationsService] Integrações do banco:', dbIntegrations.length);
 
       const configurations: IntegrationConfiguration[] = dbIntegrations.map(integration => ({
         id: integration.id,
@@ -542,8 +743,18 @@ export class IntegrationsService {
         testResults: integration.metadata?.testResults
       }));
 
-      this.configurations$.next(configurations);
-      return configurations;
+      // Remove duplicates based on ID at service level
+      const uniqueConfigurations = configurations.filter((config, index, self) =>
+        index === self.findIndex((c) => c.id === config.id)
+      );
+
+      console.log('🔄 [IntegrationsService] Configurações únicas:', uniqueConfigurations.length);
+      if (configurations.length !== uniqueConfigurations.length) {
+        console.warn('⚠️ [IntegrationsService] Duplicadas removidas:', configurations.length - uniqueConfigurations.length);
+      }
+
+      this.configurations$.next(uniqueConfigurations);
+      return uniqueConfigurations;
     } catch (error) {
       console.error('Error loading configurations from database:', error);
       return [];

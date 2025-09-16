@@ -184,6 +184,18 @@
         <ion-icon name="add" slot="start"></ion-icon>
         Nova Integração
       </ion-button>
+      <ion-button (click)="forceCreateIntegration()" color="warning" fill="outline">
+        <ion-icon name="add-circle" slot="start"></ion-icon>
+        Criar Integração Debug
+      </ion-button>
+      <ion-button (click)="testRealFacebookAPI()" color="tertiary" fill="outline">
+        <ion-icon name="globe" slot="start"></ion-icon>
+        Testar API Real
+      </ion-button>
+      <ion-button (click)="resetAndRecreate()" color="danger" fill="outline">
+        <ion-icon name="refresh-circle" slot="start"></ion-icon>
+        Reset & Criar
+      </ion-button>
     </div>
 
     <ion-card *ngFor="let config of configurations" class="config-card">

@@ -9,6 +9,7 @@ import {
 } from '../../interfaces/integration.interface';
 import { IntegrationsService } from '../../services/integrations/integrations.service';
 import { DatabaseService } from '../../services/database/database.service';
+import { FacebookConfigService } from '../../services/facebook-config.service';
 
 @Component({
   selector: 'app-integration-config',
@@ -32,7 +33,8 @@ export class IntegrationConfigComponent implements OnInit {
     private integrationsService: IntegrationsService,
     private databaseService: DatabaseService,
     private alertController: AlertController,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private facebookConfigService: FacebookConfigService
   ) {}
 
   ngOnInit() {
@@ -47,10 +49,23 @@ export class IntegrationConfigComponent implements OnInit {
       capabilities: [this.configuration?.capabilities || []]
     };
 
+    // Get default values for Facebook if not editing and provider is Facebook
+    let defaultValues: { [key: string]: any } = {};
+    if (!this.isEditing && this.provider.id === 'facebook') {
+      defaultValues = this.facebookConfigService.getConfigForForm();
+      console.log('📱 Preenchendo formulário com dados padrão do Facebook:', defaultValues);
+    }
+
     // Create form controls for each field
     this.provider.fields.forEach(field => {
       const validators = this.getValidators(field);
-      const value = this.configuration?.config?.[field.name] || '';
+      let value = this.configuration?.config?.[field.name] || '';
+
+      // Use default value if available and not editing
+      if (!this.isEditing && defaultValues[field.name]) {
+        value = defaultValues[field.name];
+      }
+
       formControls[field.name] = [value, validators];
     });
 
@@ -267,10 +282,6 @@ export class IntegrationConfigComponent implements OnInit {
       console.log('Database ready, proceeding with save...');
 
       await loading.dismiss();
-      const savingLoading = await this.loadingController.create({
-        message: 'Salvando configuração...'
-      });
-      await savingLoading.present();
 
       const configData: Partial<IntegrationConfiguration> = {
         id: this.configuration?.id,
@@ -284,8 +295,6 @@ export class IntegrationConfigComponent implements OnInit {
       const saved = await this.integrationsService.saveConfiguration(configData).toPromise();
 
       if (saved) {
-        await savingLoading.dismiss();
-
         const successAlert = await this.alertController.create({
           header: 'Sucesso!',
           message: 'Configuração salva com sucesso.',
@@ -307,14 +316,6 @@ export class IntegrationConfigComponent implements OnInit {
         await loading.dismiss();
       } catch (e) {
         // Original loading might already be dismissed
-      }
-      try {
-        const activeLoading = await this.loadingController.getTop();
-        if (activeLoading) {
-          await activeLoading.dismiss();
-        }
-      } catch (e) {
-        // No active loading
       }
 
       const errorAlert = await this.alertController.create({

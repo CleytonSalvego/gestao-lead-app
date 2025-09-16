@@ -552,17 +552,29 @@ export class DatabaseService {
 
   // Utility method to check if database is ready
   async waitForInitialization(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.isInitialized.value) {
         resolve();
-      } else {
-        const subscription = this.isInitialized.subscribe((initialized) => {
-          if (initialized) {
-            subscription.unsubscribe();
-            resolve();
-          }
-        });
+        return;
       }
+
+      // Set a timeout to prevent infinite waiting
+      const timeout = setTimeout(() => {
+        subscription.unsubscribe();
+        console.warn('Database initialization timed out, forcing fallback mode');
+        // Force fallback initialization
+        this.initializeFallback().then(() => {
+          resolve();
+        });
+      }, 10000); // 10 second timeout
+
+      const subscription = this.isInitialized.subscribe((initialized) => {
+        if (initialized) {
+          clearTimeout(timeout);
+          subscription.unsubscribe();
+          resolve();
+        }
+      });
     });
   }
 

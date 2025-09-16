@@ -136,3 +136,32 @@ export interface SocialMediaFilter {
   sortBy?: 'date' | 'engagement' | 'reach' | 'likes';
   sortOrder?: 'asc' | 'desc';
 }
+
+export interface SocialMediaIntegration {
+  id: string;
+  name: string;
+  platform: 'facebook' | 'instagram' | 'linkedin' | 'twitter';
+  isActive: boolean;
+  credentials: {
+    appId?: string;
+    appSecret?: string;
+    accessToken?: string;
+    businessManagerId?: string;
+    pageId?: string;
+    instagramAccountId?: string;
+  };
+  createdAt: Date;
+  lastSync?: Date;
+  userId: string;
+}
+
+export interface SocialMediaIntegrationConfig {
+  platform: string;
+  name: string;
+  appId: string;
+  appSecret: string;
+  accessToken: string;
+  businessManagerId?: string;
+  pageId?: string;
+  instagramAccountId?: string;
+}

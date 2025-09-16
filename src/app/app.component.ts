@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { PageTransitionService, TransitionState } from './services/page-transition.service';
+import { InstagramSetupService } from './services/instagram-setup.service';
+import { AutoIntegrationService } from './services/auto-integration.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +18,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private transitionSubscription?: Subscription;
 
-  constructor(private pageTransitionService: PageTransitionService) {}
+  constructor(
+    private pageTransitionService: PageTransitionService,
+    private instagramSetupService: InstagramSetupService,
+    private autoIntegrationService: AutoIntegrationService
+  ) {}
 
   ngOnInit() {
     // Subscribe to transition state changes

@@ -241,12 +241,19 @@ export class SocialMediaService {
 
   private async loadConnectedPagesFromDatabase(): Promise<SocialMediaPage[]> {
     try {
+      console.log('🔍 [SocialMedia] Carregando páginas conectadas do banco...');
       const dbPages = await this.databaseService.getSocialMediaPages();
+      console.log('📊 [SocialMedia] Páginas do banco:', dbPages.length, dbPages);
+
       const allPages = this.convertDBPagesToInterface(dbPages);
+      console.log('🔄 [SocialMedia] Páginas convertidas:', allPages.length, allPages);
+
       const connectedPages = allPages.filter(page => page.isConnected);
+      console.log('✅ [SocialMedia] Páginas conectadas:', connectedPages.length, connectedPages);
+
       return connectedPages;
     } catch (error) {
-      console.error('Error loading connected pages from database:', error);
+      console.error('❌ [SocialMedia] Error loading connected pages from database:', error);
       return [];
     }
   }

@@ -246,27 +246,101 @@
           </div>
           
           <div *ngIf="testResult.details" class="test-details">
-            <h4>Detalhes Adicionais:</h4>
-            <ion-list>
-              <ion-item *ngFor="let detail of getTestDetailsArray(testResult.details)">
-                <ion-label>
-                  <h3>{{ detail.key }}</h3>
-                  <p>{{ detail.value }}</p>
-                </ion-label>
-                <ion-icon 
-                  *ngIf="detail.value === true"
-                  name="checkmark-circle" 
-                  color="success" 
-                  slot="end">
-                </ion-icon>
-                <ion-icon 
-                  *ngIf="detail.value === false"
-                  name="close-circle" 
-                  color="danger" 
-                  slot="end">
-                </ion-icon>
-              </ion-item>
-            </ion-list>
+            <h4>Detalhes da Conexão:</h4>
+
+            <!-- User Info -->
+            <div *ngIf="testResult.details.user" class="detail-section">
+              <h5>👤 Usuário Facebook:</h5>
+              <p><strong>ID:</strong> {{ testResult.details.user.id }}</p>
+              <p><strong>Nome:</strong> {{ testResult.details.user.name }}</p>
+            </div>
+
+            <!-- Permissions -->
+            <div *ngIf="testResult.details.grantedPermissions" class="detail-section">
+              <h5>🔑 Permissões Concedidas:</h5>
+              <div class="permissions-list">
+                <ion-chip
+                  *ngFor="let permission of testResult.details.grantedPermissions"
+                  color="success"
+                  size="small">
+                  {{ permission }}
+                </ion-chip>
+              </div>
+            </div>
+
+            <!-- Page Info -->
+            <div *ngIf="testResult.details.pageInfo" class="detail-section">
+              <h5>📄 Página Facebook:</h5>
+              <p><strong>ID:</strong> {{ testResult.details.pageInfo.id }}</p>
+              <p><strong>Nome:</strong> {{ testResult.details.pageInfo.name }}</p>
+              <p><strong>Token da Página:</strong>
+                <ion-chip [color]="testResult.details.pageInfo.hasPageToken ? 'success' : 'warning'" size="small">
+                  {{ testResult.details.pageInfo.hasPageToken ? 'Disponível' : 'Não Disponível' }}
+                </ion-chip>
+              </p>
+            </div>
+
+            <!-- Instagram Info -->
+            <div *ngIf="testResult.details.instagramInfo" class="detail-section">
+              <h5>📸 Instagram Business:</h5>
+              <p><strong>ID:</strong> {{ testResult.details.instagramInfo.id }}</p>
+              <p><strong>Username:</strong> &#64;{{ testResult.details.instagramInfo.username }}</p>
+            </div>
+
+            <!-- Connection Status -->
+            <div class="detail-section">
+              <h5>🔗 Status das Conexões:</h5>
+              <div class="connection-status">
+                <div class="status-item">
+                  <span>Token Válido:</span>
+                  <ion-chip [color]="testResult.details.tokenValid ? 'success' : 'danger'" size="small">
+                    {{ testResult.details.tokenValid ? 'Sim' : 'Não' }}
+                  </ion-chip>
+                </div>
+                <div class="status-item">
+                  <span>Página Conectada:</span>
+                  <ion-chip [color]="testResult.details.pageConnected ? 'success' : 'warning'" size="small">
+                    {{ testResult.details.pageConnected ? 'Sim' : 'Não' }}
+                  </ion-chip>
+                </div>
+                <div class="status-item">
+                  <span>Instagram Conectado:</span>
+                  <ion-chip [color]="testResult.details.instagramConnected ? 'success' : 'warning'" size="small">
+                    {{ testResult.details.instagramConnected ? 'Sim' : 'Não' }}
+                  </ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <!-- Warning -->
+            <div *ngIf="testResult.details.warning" class="detail-section warning">
+              <h5>⚠️ Avisos:</h5>
+              <p class="warning-text">{{ testResult.details.warning }}</p>
+            </div>
+
+            <!-- Legacy details for backward compatibility -->
+            <div *ngIf="!testResult.details.user" class="detail-section legacy-details">
+              <ion-list>
+                <ion-item *ngFor="let detail of getTestDetailsArray(testResult.details)">
+                  <ion-label>
+                    <h3>{{ detail.key }}</h3>
+                    <p>{{ detail.value }}</p>
+                  </ion-label>
+                  <ion-icon
+                    *ngIf="detail.value === true"
+                    name="checkmark-circle"
+                    color="success"
+                    slot="end">
+                  </ion-icon>
+                  <ion-icon
+                    *ngIf="detail.value === false"
+                    name="close-circle"
+                    color="danger"
+                    slot="end">
+                  </ion-icon>
+                </ion-item>
+              </ion-list>
+            </div>
           </div>
           
         </ion-card-content>

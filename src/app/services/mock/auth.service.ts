@@ -11,6 +11,8 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  private needsInstagramSetupSubject = new BehaviorSubject<boolean>(false);
+  public needsInstagramSetup$ = this.needsInstagramSetupSubject.asObservable();
 
   private mockUsers: User[] = [
     {
@@ -123,6 +125,12 @@ export class AuthService {
         this.setCurrentUser(user);
         localStorage.setItem('auth_token', response.token);
         localStorage.setItem('current_user', JSON.stringify(user));
+
+        // Sinalizar que precisa configurar Instagram para analista-meta
+        if (user.email === 'analista-meta@teste.com') {
+          console.log('📸 Login do analista-meta detectado - disparando setup do Instagram');
+          this.needsInstagramSetupSubject.next(true);
+        }
 
         return response;
       })
@@ -268,5 +276,22 @@ export class AuthService {
 
     // Se não tiver nenhuma permissão específica, ir para dashboard
     return '/dashboard';
+  }
+
+  getInstagramConfig() {
+    return {
+      platform: 'instagram',
+      name: 'Instagram',
+      appId: '722085609076707',
+      appSecret: '045f9424e3d03a7dc02c8ca468edfa72',
+      accessToken: 'dd03a6d9346805abffd989d966ece52d',
+      businessManagerId: '630140316714253',
+      pageId: '579080491964703',
+      instagramAccountId: '17841474874248436'
+    };
+  }
+
+  markInstagramSetupComplete() {
+    this.needsInstagramSetupSubject.next(false);
   }
 }

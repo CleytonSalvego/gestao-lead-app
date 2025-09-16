@@ -1,10 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button menu="main-menu"></ion-menu-button>
+      <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Redes Sociais</ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="selectIntegrationAndLoadData()" color="primary" fill="solid">
+        <ion-icon name="cloud-download-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="debugDatabase()" color="warning">
+        <ion-icon name="bug-outline"></ion-icon>
+      </ion-button>
       <ion-button (click)="refreshData()">
         <ion-icon name="refresh-outline"></ion-icon>
       </ion-button>
@@ -18,6 +24,32 @@
       <ion-title size="large">Redes Sociais</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <!-- Integration Status -->
+  <div class="integration-status" *ngIf="availableIntegrations.length > 0">
+    <ion-card>
+      <ion-card-content>
+        <div class="status-content">
+          <ion-icon name="link-outline" color="primary"></ion-icon>
+          <div class="status-text">
+            <span *ngIf="!selectedIntegration" class="no-selection">
+              {{ availableIntegrations.length }} integração(ões) disponível(eis)
+            </span>
+            <span *ngIf="selectedIntegration" class="selected-integration">
+              Usando: {{ selectedIntegration.name }}
+            </span>
+          </div>
+          <ion-button
+            (click)="selectIntegrationAndLoadData()"
+            size="small"
+            fill="outline"
+            color="primary">
+            {{ selectedIntegration ? 'Atualizar' : 'Carregar' }}
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
   <!-- Stats Cards -->
   <div class="stats-container" *ngIf="stats">

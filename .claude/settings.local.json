@@ -17,7 +17,10 @@
       "Read(//c/Projetos/17 - Kleber/pcm-app/**)",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(npm run lint)",
+      "Bash(ionic serve:*)",
+      "Bash(npx ng serve:*)"
     ],
     "deny": [],
     "ask": []
