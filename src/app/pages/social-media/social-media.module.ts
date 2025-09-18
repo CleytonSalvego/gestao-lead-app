@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { SocialMediaPageRoutingModule } from './social-media-routing.module';
+import { ComingSoonModule } from '../../components/coming-soon.module';
 import { SocialMediaPage } from './social-media.page';
 
 @NgModule({
@@ -11,7 +12,8 @@ import { SocialMediaPage } from './social-media.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    SocialMediaPageRoutingModule
+    SocialMediaPageRoutingModule,
+    ComingSoonModule
   ],
   declarations: [SocialMediaPage]
 })

@@ -1,9 +1,41 @@
 // Global background gradient for ion-content
 ion-content {
   --background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-200) 100%);
-  
+
   @media (prefers-color-scheme: dark) {
     --background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+  }
+}
+
+// Loading State
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 40px 20px;
+
+  .loading-content {
+    text-align: center;
+    color: var(--ion-color-medium);
+
+    ion-spinner {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 16px;
+      color: var(--ion-color-primary);
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--ion-color-dark);
+
+      @media (prefers-color-scheme: dark) {
+        color: var(--ion-color-light);
+      }
+    }
   }
 }
 
@@ -13,20 +45,20 @@ ion-header {
     --background: white;
     --color: #2c3e50;
     --border-color: #e9ecef;
-    
+
     .toolbar-title-container {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       flex: 1;
-      
+
       ion-title {
         font-weight: 600;
         color: #2c3e50;
         margin: 0;
         padding: 0;
       }
-      
+
       .toolbar-subtitle {
         margin: 0;
         font-size: 0.75rem;
@@ -35,12 +67,42 @@ ion-header {
         font-weight: 400;
       }
     }
-    
-    ion-button {
-      --color: #6c757d;
-      
-      &:hover {
-        --color: #007bff;
+
+    ion-buttons[slot="end"] {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      ion-button {
+        --color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+
+        &[color="primary"] {
+          --border-radius: 6px;
+          font-weight: 500;
+
+          &[fill="outline"] {
+            --border-width: 1.5px;
+            --color: var(--ion-color-primary);
+            --border-color: var(--ion-color-primary);
+            --background: rgba(137, 174, 63, 0.05);
+
+            &:hover {
+              --background: rgba(137, 174, 63, 0.1);
+              --color: var(--ion-color-primary-shade);
+            }
+          }
+
+          &[fill="solid"] {
+            --background: var(--ion-color-primary);
+            --color: white;
+
+            &:hover {
+              --background: var(--ion-color-primary-shade);
+            }
+          }
+        }
       }
     }
   }
@@ -79,10 +141,47 @@ ion-segment {
 
 .tab-content {
   padding: 16px;
-  
+
   .tab-header {
     margin-bottom: 16px;
     text-align: right;
+  }
+}
+
+// Action buttons styling
+.tab-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--ion-color-step-100);
+  margin-bottom: 20px;
+
+  ion-button {
+    --border-radius: 8px;
+    font-weight: 500;
+
+    &[color="primary"] {
+      --background: var(--ion-color-primary);
+      --color: white;
+
+      ion-icon {
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    ion-button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }
 
@@ -157,46 +256,103 @@ ion-segment {
   }
 }
 
+// Configurations Grid Container (always 4 columns)
+.configurations-grid,
+.configurations-single {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
 // Configuration Cards
 .config-card {
   border-radius: 12px;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 1rem;
+  margin-bottom: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  ion-card-header {
+    padding: 1rem 1.25rem 0.75rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid var(--ion-color-step-100);
+  }
+
+  ion-card-content {
+    padding: 1rem 1.25rem;
+  }
 
   .config-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    margin-bottom: 0;
 
     .config-info {
       flex: 1;
       min-width: 0;
+
+      ion-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--ion-color-dark);
+      }
+
+      ion-card-subtitle {
+        font-size: 0.875rem;
+        color: var(--ion-color-medium);
+        font-weight: 500;
+      }
     }
 
     .config-status {
       flex-shrink: 0;
+      margin-left: 1rem;
     }
   }
 
   .config-details {
-    margin: 1rem 0;
+    margin: 0.75rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
 
     .detail-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid var(--ion-color-step-150);
-
-      &:last-child {
-        border-bottom: none;
-      }
+      padding: 0.5rem 0.75rem;
+      background: var(--ion-color-step-50);
+      border-radius: 8px;
+      border: 1px solid var(--ion-color-step-100);
 
       .label {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         color: var(--ion-color-medium);
         font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
       .value {
@@ -211,15 +367,24 @@ ion-segment {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--ion-color-step-150);
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--ion-color-step-100);
 
     ion-button {
-      --padding-start: 12px;
-      --padding-end: 12px;
-      font-size: 0.875rem;
+      --padding-start: 10px;
+      --padding-end: 10px;
+      --height: 32px;
+      font-size: 0.8rem;
       flex-shrink: 0;
+      font-weight: 500;
+
+      &[fill="outline"] {
+        --border-width: 1.5px;
+        --background: white;
+        --color: var(--ion-color-primary);
+        --border-color: var(--ion-color-primary);
+      }
     }
   }
 }
@@ -561,6 +726,14 @@ ion-header ion-toolbar {
   }
 }
 
+// Button styles for outline buttons (keeping for other buttons)
+ion-button[fill="outline"] {
+  --border-width: 1.5px;
+  --background: white;
+  --color: var(--ion-color-primary);
+  --border-color: var(--ion-color-primary);
+}
+
 // Dark mode support
 @media (prefers-color-scheme: dark) {
   .stat-card {
@@ -570,5 +743,11 @@ ion-header ion-toolbar {
 
   .integration-card {
     background: var(--ion-color-step-50);
+  }
+
+  // Dark mode button fix
+  ion-button[color="primary"][fill="outline"] {
+    --background: var(--ion-color-step-50) !important;
+    --color: var(--ion-color-primary) !important;
   }
 }

@@ -26,7 +26,20 @@ export class UserService {
     }
 
     async logout() {
-        this.storageRepository.delete(["user", "token", "student", "unitData"]);
+        // Remove todas as informações relacionadas ao login automático
+        this.storageRepository.delete(["user", "token", "student", "unitData", "auth_token", "current_user"]);
+
+        // Remove também do localStorage (usado pelo AuthService)
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('current_user');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('remember_me');
+
+        // Remove do sessionStorage também
+        sessionStorage.removeItem('auth_token');
+        sessionStorage.removeItem('current_user');
+        sessionStorage.clear();
+
         return true;
     }
 

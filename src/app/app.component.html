@@ -1,6 +1,6 @@
 <ion-app>
   <jeep-sqlite autoSave="true"></jeep-sqlite>
-  <app-side-menu></app-side-menu>
+  <app-side-menu *ngIf="showMenu"></app-side-menu>
   <ion-router-outlet id="main-content"></ion-router-outlet>
 
   <!-- Page Transition Animation -->

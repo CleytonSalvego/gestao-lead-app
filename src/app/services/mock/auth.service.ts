@@ -198,8 +198,22 @@ export class AuthService {
       delay(500),
       map(() => {
         this.setCurrentUser(null);
+
+        // Remove todas as informações relacionadas ao login automático
         localStorage.removeItem('auth_token');
         localStorage.removeItem('current_user');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('remember_me');
+        localStorage.removeItem('user_preferences');
+
+        // Remove do sessionStorage também
+        sessionStorage.removeItem('auth_token');
+        sessionStorage.removeItem('current_user');
+        sessionStorage.clear();
+
+        // Reset dos subjects para estado não autenticado
+        this.needsInstagramSetupSubject.next(false);
+
         return true;
       })
     );

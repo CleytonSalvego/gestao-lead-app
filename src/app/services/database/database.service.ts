@@ -665,31 +665,173 @@ export class DatabaseService {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
 
-    const values = [
-      postWithDates.id,
-      postWithDates.pageId,
-      postWithDates.platform,
-      postWithDates.postId,
-      postWithDates.type,
-      postWithDates.content || null,
-      postWithDates.mediaUrls ? JSON.stringify(postWithDates.mediaUrls) : null,
-      postWithDates.hashtags ? JSON.stringify(postWithDates.hashtags) : null,
-      postWithDates.likes || 0,
-      postWithDates.comments || 0,
-      postWithDates.shares || 0,
-      postWithDates.reactions || 0,
-      postWithDates.reach || 0,
-      postWithDates.impressions || 0,
-      postWithDates.engagement || 0,
-      postWithDates.clicks || 0,
-      postWithDates.saves || 0,
-      postWithDates.publishedAt.toISOString(),
-      postWithDates.createdAt.toISOString(),
-      postWithDates.updatedAt.toISOString(),
-      postWithDates.isActive !== false ? 1 : 0
-    ];
+    try {
+      await this.db.run(sql, [
+        postWithDates.id,
+        postWithDates.pageId,
+        postWithDates.platform,
+        postWithDates.postId,
+        postWithDates.type,
+        postWithDates.content,
+        JSON.stringify(postWithDates.mediaUrls || []),
+        JSON.stringify(postWithDates.hashtags || []),
+        postWithDates.likes,
+        postWithDates.comments,
+        postWithDates.shares,
+        postWithDates.reactions,
+        postWithDates.reach,
+        postWithDates.impressions,
+        postWithDates.engagement,
+        postWithDates.clicks,
+        postWithDates.saves,
+        postWithDates.publishedAt.toISOString(),
+        postWithDates.createdAt.toISOString(),
+        postWithDates.updatedAt.toISOString(),
+        postWithDates.isActive ? 1 : 0
+      ]);
 
-    await this.db.run(sql, values);
+      return postWithDates;
+    } catch (error) {
+      console.error('Error creating social media post:', error);
+      throw error;
+    }
+  }
+
+  async upsertSocialMediaPost(post: Omit<SocialMediaPostDB, 'createdAt' | 'updatedAt'>): Promise<SocialMediaPostDB> {
+    if (!this.db) {
+      return this.upsertSocialMediaPostFallback(post);
+    }
+
+    const now = new Date();
+
+    // Check if post exists
+    const existingPostSQL = `SELECT created_at FROM social_media_posts WHERE id = ?`;
+    try {
+      const result = await this.db.query(existingPostSQL, [post.id]);
+
+      let postWithDates: SocialMediaPostDB;
+
+      if (result.values && result.values.length > 0) {
+        // Post exists, update it
+        postWithDates = {
+          ...post,
+          createdAt: new Date(result.values[0].created_at),
+          updatedAt: now
+        };
+
+        const updateSQL = `
+          UPDATE social_media_posts SET
+            page_id = ?, platform = ?, post_id = ?, type = ?, content = ?,
+            media_urls = ?, hashtags = ?, likes = ?, comments = ?, shares = ?,
+            reactions = ?, reach = ?, impressions = ?, engagement = ?, clicks = ?,
+            saves = ?, published_at = ?, updated_at = ?, is_active = ?
+          WHERE id = ?
+        `;
+
+        await this.db.run(updateSQL, [
+          postWithDates.pageId,
+          postWithDates.platform,
+          postWithDates.postId,
+          postWithDates.type,
+          postWithDates.content,
+          JSON.stringify(postWithDates.mediaUrls || []),
+          JSON.stringify(postWithDates.hashtags || []),
+          postWithDates.likes,
+          postWithDates.comments,
+          postWithDates.shares,
+          postWithDates.reactions,
+          postWithDates.reach,
+          postWithDates.impressions,
+          postWithDates.engagement,
+          postWithDates.clicks,
+          postWithDates.saves,
+          postWithDates.publishedAt.toISOString(),
+          postWithDates.updatedAt.toISOString(),
+          postWithDates.isActive ? 1 : 0,
+          postWithDates.id
+        ]);
+
+        console.log('📝 Post atualizado:', post.id);
+      } else {
+        // Post doesn't exist, create it
+        postWithDates = {
+          ...post,
+          createdAt: now,
+          updatedAt: now
+        };
+
+        const insertSQL = `
+          INSERT INTO social_media_posts (
+            id, page_id, platform, post_id, type, content, media_urls, hashtags,
+            likes, comments, shares, reactions, reach, impressions, engagement,
+            clicks, saves, published_at, created_at, updated_at, is_active
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `;
+
+        await this.db.run(insertSQL, [
+          postWithDates.id,
+          postWithDates.pageId,
+          postWithDates.platform,
+          postWithDates.postId,
+          postWithDates.type,
+          postWithDates.content,
+          JSON.stringify(postWithDates.mediaUrls || []),
+          JSON.stringify(postWithDates.hashtags || []),
+          postWithDates.likes,
+          postWithDates.comments,
+          postWithDates.shares,
+          postWithDates.reactions,
+          postWithDates.reach,
+          postWithDates.impressions,
+          postWithDates.engagement,
+          postWithDates.clicks,
+          postWithDates.saves,
+          postWithDates.publishedAt.toISOString(),
+          postWithDates.createdAt.toISOString(),
+          postWithDates.updatedAt.toISOString(),
+          postWithDates.isActive ? 1 : 0
+        ]);
+
+        console.log('✅ Post criado:', post.id);
+      }
+
+      return postWithDates;
+    } catch (error) {
+      console.error('Error upserting social media post:', error);
+      throw error;
+    }
+  }
+
+  private async upsertSocialMediaPostFallback(post: Omit<SocialMediaPostDB, 'createdAt' | 'updatedAt'>): Promise<SocialMediaPostDB> {
+    const now = new Date();
+    const posts = this.getSocialMediaPostsFromStorage();
+
+    // Check if post exists
+    const existingIndex = posts.findIndex(p => p.id === post.id);
+
+    let postWithDates: SocialMediaPostDB;
+
+    if (existingIndex >= 0) {
+      // Update existing post
+      postWithDates = {
+        ...post,
+        createdAt: posts[existingIndex].createdAt,
+        updatedAt: now
+      };
+      posts[existingIndex] = postWithDates;
+      console.log('📝 Post atualizado (fallback):', post.id);
+    } else {
+      // Create new post
+      postWithDates = {
+        ...post,
+        createdAt: now,
+        updatedAt: now
+      };
+      posts.push(postWithDates);
+      console.log('✅ Post criado (fallback):', post.id);
+    }
+
+    localStorage.setItem('gestao_lead_posts', JSON.stringify(posts));
     return postWithDates;
   }
 

@@ -11,7 +11,20 @@
 
 <ion-content class="integration-config-content">
   <div class="config-container">
-    
+
+    <!-- Masked Data Warning -->
+    <ion-card *ngIf="isMasked" class="masked-data-warning">
+      <ion-card-content>
+        <div class="warning-content">
+          <ion-icon name="lock-closed" color="warning"></ion-icon>
+          <div class="warning-text">
+            <h3>Dados Mascarados</h3>
+            <p>Por questões de segurança, alguns dados sensíveis estão mascarados. IDs mostram apenas os primeiros e últimos 2 caracteres, e tokens estão completamente ocultos.</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
     <!-- Provider Info -->
     <ion-card class="provider-info-card">
       <ion-card-content>
@@ -372,13 +385,13 @@
         <span *ngIf="isTesting">Testando...</span>
       </ion-button>
       
-      <ion-button 
-        (click)="save()" 
-        [disabled]="configForm.invalid"
+      <ion-button
+        (click)="save()"
+        [disabled]="configForm.invalid || isMasked"
         color="primary"
         class="save-button">
         <ion-icon name="save" slot="start"></ion-icon>
-        Salvar
+        {{ isMasked ? 'Dados Mascarados' : 'Salvar' }}
       </ion-button>
     </div>
   </ion-toolbar>

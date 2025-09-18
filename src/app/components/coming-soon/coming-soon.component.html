@@ -13,31 +13,19 @@
       <h1 class="title">{{ title }}</h1>
       <h2 class="subtitle">{{ subtitle }}</h2>
       <p class="description">{{ description }}</p>
-    </div>
 
-    <!-- Progress Indicator -->
-    <div class="progress-section">
-      <div class="progress-dots">
-        <div class="dot active"></div>
-        <div class="dot active"></div>
-        <div class="dot active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+      <!-- Action Button -->
+      <div class="action-buttons" *ngIf="showButton">
+        <ion-button
+          [color]="buttonColor"
+          [fill]="buttonFill"
+          (click)="onButtonClick()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          {{ buttonText }}
+        </ion-button>
       </div>
-      <p class="progress-text">Em desenvolvimento...</p>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <ion-button fill="outline" color="medium" size="default">
-        <ion-icon name="notifications-outline" slot="start"></ion-icon>
-        Notificar quando pronto
-      </ion-button>
-      <ion-button fill="clear" color="primary" size="default">
-        <ion-icon name="arrow-back" slot="start"></ion-icon>
-        Voltar
-      </ion-button>
-    </div>
   </div>
 
   <!-- Background Decoration -->

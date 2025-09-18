@@ -14,6 +14,8 @@ import {
 import { IntegrationsService } from '../../services/integrations/integrations.service';
 import { IntegrationConfigComponent } from '../../components/integration-config/integration-config.component';
 import { AutoIntegrationService } from '../../services/auto-integration.service';
+import { AuthService } from '../../services/mock/auth.service';
+import { UserRole } from '../../interfaces/auth.interface';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -47,16 +49,33 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     activeWebhooks: 0
   };
 
+  // UI State
+  isAnalyst = false;
+  isMetaAnalyst = false;
+  isCreatingIntegration = false;
+
   constructor(
     private integrationsService: IntegrationsService,
     private modalController: ModalController,
     private alertController: AlertController,
     private loadingController: LoadingController,
-    private autoIntegrationService: AutoIntegrationService
+    private autoIntegrationService: AutoIntegrationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.loadData();
+
+    // Check if user is analyst to disable configuration buttons
+    this.authService.currentUser$.subscribe(user => {
+      this.isAnalyst = user?.role === UserRole.META_ANALYST;
+      this.isMetaAnalyst = user?.email === 'analista-meta@teste.com';
+
+      // If user is meta analyst, automatically set to configurations tab
+      if (this.isMetaAnalyst) {
+        this.selectedSegment = 'configurations';
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -80,7 +99,6 @@ export class IntegrationsPage implements OnInit, OnDestroy {
         const uniqueConfigs = configs.filter((config, index, self) =>
           index === self.findIndex((c) => c.id === config.id)
         );
-        console.log('📋 Configurações carregadas:', configs.length, '/ Únicas:', uniqueConfigs.length);
         this.configurations = uniqueConfigs;
       });
 
@@ -134,6 +152,9 @@ export class IntegrationsPage implements OnInit, OnDestroy {
   }
 
   async showProvidersModal() {
+    // Pequeno delay para mostrar o loading
+    await new Promise(resolve => setTimeout(resolve, 800));
+
     const alert = await this.alertController.create({
       header: 'Selecionar Provedor',
       message: 'Escolha o tipo de integração que deseja configurar:',
@@ -206,11 +227,20 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     const provider = this.providers.find(p => p.id === config.providerId);
     if (!provider) return;
 
+    // Criar uma cópia da configuração para mascaramento se necessário
+    let configToEdit = { ...config };
+
+    // Se o usuário for analista-meta@teste.com, mascarar dados sensíveis
+    if (this.isMetaAnalyst && config.name === 'Redes Sociais Teste') {
+      configToEdit = this.maskSensitiveData(config);
+    }
+
     const modal = await this.modalController.create({
       component: IntegrationConfigComponent,
       componentProps: {
         provider: provider,
-        configuration: config
+        configuration: configToEdit,
+        isMasked: this.isMetaAnalyst && config.name === 'Redes Sociais Teste'
       },
       cssClass: 'integration-config-modal'
     });
@@ -222,6 +252,53 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     });
 
     return await modal.present();
+  }
+
+  /**
+   * Mascara dados sensíveis para o usuário analista-meta@teste.com
+   */
+  private maskSensitiveData(config: IntegrationConfiguration): IntegrationConfiguration {
+    const maskedConfig = { ...config };
+
+    if (maskedConfig.config) {
+      const conf = maskedConfig.config;
+
+      // Mascarar IDs: mostrar apenas 2 primeiros e 2 últimos caracteres
+      if (conf.pageId) {
+        conf.pageId = this.maskId(conf.pageId);
+      }
+      if (conf.instagramAccountId) {
+        conf.instagramAccountId = this.maskId(conf.instagramAccountId);
+      }
+      if (conf.appId) {
+        conf.appId = this.maskId(conf.appId);
+      }
+
+      // Mascarar token completamente
+      if (conf.accessToken) {
+        conf.accessToken = '****************************';
+      }
+      if (conf.appSecret) {
+        conf.appSecret = '****************************';
+      }
+    }
+
+    return maskedConfig;
+  }
+
+  /**
+   * Mascara um ID mostrando apenas os 2 primeiros e 2 últimos caracteres
+   */
+  private maskId(id: string): string {
+    if (!id || id.length <= 4) {
+      return '****';
+    }
+
+    const firstTwo = id.substring(0, 2);
+    const lastTwo = id.substring(id.length - 2);
+    const maskedMiddle = '****';
+
+    return `${firstTwo}${maskedMiddle}${lastTwo}`;
   }
 
   async testIntegration(config: IntegrationConfiguration) {
@@ -327,17 +404,14 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     }
 
     // TODO: Implement webhook creation modal
-    console.log('Creating webhook...');
   }
 
   async testWebhook(webhook: WebhookConfiguration) {
-    console.log('Testing webhook:', webhook.name);
     // TODO: Implement webhook testing
   }
 
   // Utility methods
   exportLogs() {
-    console.log('Exporting logs...');
     // TODO: Implement log export
   }
 
@@ -362,18 +436,15 @@ export class IntegrationsPage implements OnInit, OnDestroy {
   }
 
   async forceCreateIntegration() {
-    console.log('🔧 BOTÃO CLICADO - COMEÇANDO...');
 
     try {
-      console.log('📋 Configurações atuais:', this.configurations.length);
 
       // Pular verificação e ir direto para criação
-      console.log('💾 CRIANDO INTEGRAÇÃO DIRETAMENTE...');
 
       // Criar configuração usando o DatabaseService diretamente
       const newIntegration = {
         id: `integration_${Date.now()}`,
-        name: `Facebook Debug ${Date.now()}`,
+        name: `Redes Sociais Teste`,
         type: 'facebook' as const,
         status: 'active' as const,
         configuration: {
@@ -393,12 +464,10 @@ export class IntegrationsPage implements OnInit, OnDestroy {
         }
       };
 
-      console.log('💾 SALVANDO NO BANCO DIRETAMENTE...');
 
       // Usar o DatabaseService diretamente
       const savedIntegration = await (this.integrationsService as any).databaseService.createIntegration(newIntegration);
 
-      console.log('✅ INTEGRAÇÃO SALVA:', savedIntegration);
 
       // Adicionar à lista local
       const newConfig = {
@@ -413,15 +482,12 @@ export class IntegrationsPage implements OnInit, OnDestroy {
       };
 
       this.configurations.push(newConfig);
-      console.log('✅ CONFIGURAÇÃO ADICIONADA À LISTA LOCAL');
 
       // Também adicionar ao BehaviorSubject do service para que o teste funcione
       const serviceConfigurations = (this.integrationsService as any).configurations$.value;
       serviceConfigurations.push(newConfig);
       (this.integrationsService as any).configurations$.next([...serviceConfigurations]);
-      console.log('✅ CONFIGURAÇÃO ADICIONADA AO SERVICE');
 
-      console.log('📊 Total de configurações:', this.configurations.length);
 
     } catch (error: any) {
       console.error('❌ ERRO COMPLETO:', error);
@@ -429,9 +495,43 @@ export class IntegrationsPage implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Handle new integration button click
+   * Routes to appropriate method based on user type
+   */
+  async handleNewIntegration() {
+
+    // Verificação especial para analista-meta@teste.com
+    if (this.isMetaAnalyst) {
+      // Verificar se já existe a integração teste
+      const testIntegration = this.configurations.find(config =>
+        config.name === 'Redes Sociais Teste' || config.name === 'Facebook Teste'
+      );
+
+      if (testIntegration) {
+        await this.editConfiguration(testIntegration);
+        return;
+      }
+    }
+
+    // Mostrar loading inline na tela
+    this.isCreatingIntegration = true;
+
+    try {
+      if (this.isMetaAnalyst) {
+        // For analista-meta@teste.com: create test integration directly
+        await this.forceCreateIntegration();
+      } else {
+        // For other users: show normal provider selection modal
+        await this.showProvidersModal();
+      }
+    } finally {
+      this.isCreatingIntegration = false;
+    }
+  }
+
   async testRealFacebookAPI() {
     try {
-      console.log('🌐 TESTANDO API REAL DO FACEBOOK...');
 
       const loading = await this.loadingController.create({
         message: 'Testando API real do Facebook...'
@@ -444,7 +544,6 @@ export class IntegrationsPage implements OnInit, OnDestroy {
       // Fazer chamada direta para a API do Facebook
       const testUrl = `https://graph.facebook.com/v18.0/me?access_token=${testToken}&fields=id,name`;
 
-      console.log('🔗 URL de teste:', testUrl);
 
       try {
         const response = await fetch(testUrl);
@@ -452,7 +551,6 @@ export class IntegrationsPage implements OnInit, OnDestroy {
 
         await loading.dismiss();
 
-        console.log('📊 RESPOSTA DA API:', data);
 
         if (data.error) {
           // Erro da API do Facebook
@@ -496,33 +594,26 @@ export class IntegrationsPage implements OnInit, OnDestroy {
 
   async resetAndRecreate() {
     try {
-      console.log('🔄 RESETANDO TUDO E RECRIANDO...');
 
       // Limpar localStorage
       localStorage.removeItem('auto_integration_created');
       localStorage.removeItem('facebook_default_config');
-      console.log('🗑️ localStorage limpo');
 
       // Limpar arrays locais
       this.configurations = [];
-      console.log('📋 Array local limpo');
 
       // Limpar service
       (this.integrationsService as any).configurations$.next([]);
-      console.log('🔄 Service limpo');
 
       // Aguardar um pouco
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Forçar recriação
-      console.log('🚀 Forçando recriação...');
       await this.autoIntegrationService.forceCreateConfiguration();
 
       // Recarregar dados
-      console.log('🔄 Recarregando dados...');
       this.loadData();
 
-      console.log('✅ RESET E RECRIAÇÃO COMPLETOS!');
 
     } catch (error: any) {
       console.error('❌ ERRO NO RESET:', error);

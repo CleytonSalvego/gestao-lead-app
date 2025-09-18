@@ -123,8 +123,31 @@ export class SideMenuComponent  implements OnInit {
   }
 
   async logout() {
-    await this.userService.logout();
-    return await this.controllerService.navigateLogin();
+    try {
+      // Primeiro chama o logout do userService para limpar storage local
+      await this.userService.logout();
+
+      // Depois chama o logout do authService e aguarda a conclusão
+      await new Promise((resolve, reject) => {
+        this.mockAuthService.logout().subscribe({
+          next: () => {
+            console.log('Logout completo realizado');
+            resolve(true);
+          },
+          error: (error) => {
+            console.error('Erro durante logout:', error);
+            reject(error);
+          }
+        });
+      });
+
+      // Navega para tela de login apenas após logout completo
+      return await this.controllerService.navigateLogin();
+    } catch (error) {
+      console.error('Erro no processo de logout:', error);
+      // Mesmo com erro, navega para login
+      return await this.controllerService.navigateLogin();
+    }
   }
 
   toggleDarkTheme() {

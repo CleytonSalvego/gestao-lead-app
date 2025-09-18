@@ -8,6 +8,12 @@
       <p class="toolbar-subtitle">Gerencie integrações e monitore logs de atividade</p>
     </div>
     <ion-buttons slot="end">
+      <ion-button
+        (click)="handleNewIntegration()"
+        color="primary"
+        fill="solid">
+        Nova Integração
+      </ion-button>
       <ion-button fill="clear" (click)="exportLogs()">
         <ion-icon name="download" slot="icon-only"></ion-icon>
       </ion-button>
@@ -20,48 +26,30 @@
   <div class="page-container">
 
     <div class="integrations-content">
-      <!-- Stats Cards -->
-      <div class="stats-container">
-    <ion-grid>
-      <ion-row>
-        <ion-col size="6" size-md="3">
-          <ion-card class="stat-card">
-            <ion-card-content>
-              <div class="stat-value">{{ stats.totalAPIs }}</div>
-              <div class="stat-label">APIs</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="6" size-md="3">
-          <ion-card class="stat-card">
-            <ion-card-content>
-              <div class="stat-value">{{ stats.totalWebhooks }}</div>
-              <div class="stat-label">Webhooks</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="6" size-md="3">
-          <ion-card class="stat-card">
-            <ion-card-content>
-              <div class="stat-value">{{ stats.todayCalls }}</div>
-              <div class="stat-label">Calls Hoje</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-        <ion-col size="6" size-md="3">
-          <ion-card class="stat-card">
-            <ion-card-content>
-              <div class="stat-value">{{ stats.avgResponseTime | number:'1.0-0' }}ms</div>
-              <div class="stat-label">Tempo Médio</div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+
+  <!-- Loading State: Creating Integration -->
+  <div class="loading-state" *ngIf="isCreatingIntegration">
+    <div class="loading-content">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Criando Nova Integração...</p>
+    </div>
+  </div>
+
+  <!-- Empty State: No Integrations -->
+  <div class="page-container" *ngIf="configurations.length === 0">
+    <div class="integrations-content">
+      <app-coming-soon
+        title="Integrações"
+        subtitle="Gerencie suas informações"
+        description="Configure integrações com redes sociais para visualizar e gerenciar posts, reels e campanhas. Conecte-se com Facebook, Instagram e outras plataformas."
+        icon="link-outline"
+        iconColor="primary">
+      </app-coming-soon>
+    </div>
   </div>
 
   <!-- Segment Navigation -->
-  <ion-segment [(ngModel)]="selectedSegment" color="primary">
+  <ion-segment [(ngModel)]="selectedSegment" color="primary" *ngIf="!isMetaAnalyst && configurations.length > 0">
     <ion-segment-button value="overview">
       <ion-icon name="analytics"></ion-icon>
       <ion-label>Visão Geral</ion-label>
@@ -84,8 +72,16 @@
     </ion-segment-button>
   </ion-segment>
 
+  <!-- Meta Analyst Navigation (only Configurations) -->
+  <ion-segment [(ngModel)]="selectedSegment" color="primary" *ngIf="isMetaAnalyst && configurations.length > 0">
+    <ion-segment-button value="configurations">
+      <ion-icon name="settings"></ion-icon>
+      <ion-label>Configurações</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
   <!-- Overview Tab -->
-  <div *ngIf="selectedSegment === 'overview'" class="tab-content">
+  <div *ngIf="selectedSegment === 'overview' && configurations.length > 0" class="tab-content">
     <ion-card>
       <ion-card-header>
         <ion-card-title>Resumo das Integrações</ion-card-title>
@@ -138,7 +134,7 @@
   </div>
 
   <!-- Providers Tab -->
-  <div *ngIf="selectedSegment === 'providers'" class="tab-content">
+  <div *ngIf="selectedSegment === 'providers' && configurations.length > 0" class="tab-content">
     <div class="providers-grid">
       <ion-card *ngFor="let provider of providers" class="provider-card" (click)="configureProvider(provider)">
         <ion-card-content>
@@ -178,27 +174,10 @@
   </div>
 
   <!-- Configurations Tab -->
-  <div *ngIf="selectedSegment === 'configurations'" class="tab-content">
-    <div class="tab-header">
-      <ion-button (click)="showProvidersModal()" color="primary">
-        <ion-icon name="add" slot="start"></ion-icon>
-        Nova Integração
-      </ion-button>
-      <ion-button (click)="forceCreateIntegration()" color="warning" fill="outline">
-        <ion-icon name="add-circle" slot="start"></ion-icon>
-        Criar Integração Debug
-      </ion-button>
-      <ion-button (click)="testRealFacebookAPI()" color="tertiary" fill="outline">
-        <ion-icon name="globe" slot="start"></ion-icon>
-        Testar API Real
-      </ion-button>
-      <ion-button (click)="resetAndRecreate()" color="danger" fill="outline">
-        <ion-icon name="refresh-circle" slot="start"></ion-icon>
-        Reset & Criar
-      </ion-button>
-    </div>
+  <div *ngIf="selectedSegment === 'configurations' && configurations.length > 0" class="tab-content">
 
-    <ion-card *ngFor="let config of configurations" class="config-card">
+    <div [ngClass]="configurations.length > 1 ? 'configurations-grid' : 'configurations-single'">
+      <ion-card *ngFor="let config of configurations" class="config-card">
       <ion-card-header>
         <div class="config-header">
           <div class="config-info">
@@ -239,40 +218,36 @@
             <span *ngIf="config.status === 'testing'">Testando...</span>
           </ion-button>
           
-          <ion-button 
-            fill="outline" 
-            size="small" 
+          <ion-button
+            fill="outline"
+            size="small"
             (click)="editConfiguration(config)">
             <ion-icon name="settings" slot="start"></ion-icon>
             Configurar
           </ion-button>
-          
-          <ion-button 
-            fill="clear" 
-            size="small" 
+
+          <ion-button
+            fill="clear"
+            size="small"
             color="danger"
+            [disabled]="isAnalyst"
             (click)="deleteConfiguration(config)">
             <ion-icon name="trash" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
       </ion-card-content>
     </ion-card>
-    
-    <div *ngIf="configurations.length === 0" class="empty-state">
-      <ion-icon name="settings-outline"></ion-icon>
-      <h3>Nenhuma Integração Configurada</h3>
-      <p>Configure sua primeira integração para começar a capturar leads e dados de campanhas.</p>
-      <ion-button (click)="showProvidersModal()" color="primary">
-        <ion-icon name="add" slot="start"></ion-icon>
-        Adicionar Integração
-      </ion-button>
     </div>
+
   </div>
 
   <!-- Webhooks Tab -->
-  <div *ngIf="selectedSegment === 'webhooks'" class="tab-content">
+  <div *ngIf="selectedSegment === 'webhooks' && configurations.length > 0" class="tab-content">
     <div class="tab-header">
-      <ion-button (click)="createWebhook()" color="primary">
+      <ion-button
+        (click)="createWebhook()"
+        color="primary"
+        [disabled]="isAnalyst">
         <ion-icon name="add" slot="start"></ion-icon>
         Novo Webhook
       </ion-button>
@@ -327,7 +302,7 @@
   </div>
 
   <!-- Logs Tab -->
-  <div *ngIf="selectedSegment === 'logs'" class="tab-content">
+  <div *ngIf="selectedSegment === 'logs' && configurations.length > 0" class="tab-content">
     <ion-card>
       <ion-card-header>
         <ion-card-title>Logs de API</ion-card-title>

@@ -19,6 +19,7 @@ import { FacebookConfigService } from '../../services/facebook-config.service';
 export class IntegrationConfigComponent implements OnInit {
   @Input() provider!: IntegrationProvider;
   @Input() configuration?: IntegrationConfiguration;
+  @Input() isMasked = false; // Indica se os dados estão mascarados
   @Output() saved = new EventEmitter<IntegrationConfiguration>();
   @Output() cancelled = new EventEmitter<void>();
 
@@ -260,6 +261,17 @@ export class IntegrationConfigComponent implements OnInit {
   }
 
   async save() {
+    // Verificar se os dados estão mascarados
+    if (this.isMasked) {
+      const alert = await this.alertController.create({
+        header: 'Dados Mascarados',
+        message: 'Não é possível salvar alterações quando os dados estão mascarados por questões de segurança.',
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    }
+
     if (this.configForm.invalid) {
       const alert = await this.alertController.create({
         header: 'Formulário Inválido',

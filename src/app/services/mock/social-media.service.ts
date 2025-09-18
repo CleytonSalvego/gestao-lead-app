@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { Observable, of, BehaviorSubject, from } from 'rxjs';
 import { delay, map, switchMap } from 'rxjs/operators';
 import {
   SocialMediaPost,
@@ -34,7 +34,7 @@ export class SocialMediaService {
         if (!initialized) {
           return of([]);
         }
-        return this.loadPostsFromDatabase(filter);
+        return from(this.loadPostsFromDatabase(filter));
       })
     );
   }
@@ -48,9 +48,13 @@ export class SocialMediaService {
 
   // Campaigns
   getCampaigns(filter?: SocialMediaFilter): Observable<SocialMediaCampaign[]> {
-    return this.campaignsSubject.asObservable().pipe(
-      map(campaigns => this.applyCampaignFilter(campaigns, filter)),
-      delay(500)
+    return this.databaseService.isInitialized$.pipe(
+      switchMap(initialized => {
+        if (!initialized) {
+          return of([]);
+        }
+        return from(this.loadCampaignsFromDatabase(filter));
+      })
     );
   }
 
@@ -119,24 +123,35 @@ export class SocialMediaService {
   }
 
   private applyFilter(posts: SocialMediaPost[], filter?: SocialMediaFilter): SocialMediaPost[] {
+    console.log('🔍 Aplicando filtro:', filter);
+    console.log('📊 Posts antes do filtro:', posts.length, posts.map(p => ({ id: p.id, pageId: p.pageId, platform: p.platform })));
+
     if (!filter) return posts;
 
     let filtered = [...posts];
 
     if (filter.platform && filter.platform !== 'all') {
       filtered = filtered.filter(post => post.platform === filter.platform);
+      console.log('📱 Filtro por plataforma:', filter.platform, 'posts restantes:', filtered.length);
     }
 
     if (filter.type && filter.type !== 'all') {
       filtered = filtered.filter(post => post.type === filter.type);
+      console.log('🏷️ Filtro por tipo:', filter.type, 'posts restantes:', filtered.length);
     }
 
     if (filter.status && filter.status !== 'all') {
       filtered = filtered.filter(post => post.status === filter.status);
+      console.log('📈 Filtro por status:', filter.status, 'posts restantes:', filtered.length);
     }
 
     if (filter.pageId) {
-      filtered = filtered.filter(post => post.pageId === filter.pageId);
+      console.log('🔍 Filtrando por pageId:', filter.pageId);
+      filtered = filtered.filter(post => {
+        console.log(`📄 Comparando: post.pageId="${post.pageId}" com filter.pageId="${filter.pageId}"`);
+        return post.pageId === filter.pageId;
+      });
+      console.log('📄 Filtro por página:', filter.pageId, 'posts restantes:', filtered.length);
     }
 
     if (filter.dateRange) {
@@ -175,6 +190,7 @@ export class SocialMediaService {
       });
     }
 
+    console.log('✅ Posts finais após filtro:', filtered.length, filtered.map(p => ({ id: p.id, pageId: p.pageId, platform: p.platform })));
     return filtered;
   }
 
@@ -216,11 +232,31 @@ export class SocialMediaService {
 
   private async loadPostsFromDatabase(filter?: SocialMediaFilter): Promise<SocialMediaPost[]> {
     try {
-      const dbPosts = await this.databaseService.getSocialMediaPosts(undefined, 50);
-      const posts = this.convertDBPostsToInterface(dbPosts);
-      const filteredPosts = this.applyFilter(posts, filter);
-      this.postsSubject.next(filteredPosts);
-      return filteredPosts;
+      console.log('📊 Carregando posts do banco de dados...');
+
+      // Buscar posts no banco de dados (limitado a 3 mais recentes)
+      const dbPosts = await this.databaseService.getSocialMediaPosts(undefined, 3);
+      console.log('📊 Posts encontrados no banco:', dbPosts.length);
+
+      // Se há posts no banco, usar eles
+      if (dbPosts.length > 0) {
+        const posts = this.convertDBPostsToInterface(dbPosts);
+        const filteredPosts = this.applyFilter(posts, filter);
+
+        // Limitar a 3 posts mais recentes após filtragem
+        const recentPosts = filteredPosts
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 3);
+
+        console.log('✅ Posts filtrados (limitados a 3 mais recentes):', recentPosts.length);
+        this.postsSubject.next(recentPosts);
+        return recentPosts;
+      }
+
+      // Se não há posts, retornar array vazio (não usar dados mock)
+      console.log('ℹ️ Nenhum post encontrado no banco. Use a função "Carregar dados reais" para importar posts.');
+      this.postsSubject.next([]);
+      return [];
     } catch (error) {
       console.error('Error loading posts from database:', error);
       return [];
@@ -268,10 +304,26 @@ export class SocialMediaService {
     }
   }
 
+  private async loadCampaignsFromDatabase(filter?: SocialMediaFilter): Promise<SocialMediaCampaign[]> {
+    try {
+      console.log('📊 Carregando campanhas do banco de dados...');
+
+      // Por enquanto, campanhas retornam vazio até implementarmos a API do Facebook Ads
+      // TODO: Implementar carregamento de campanhas reais da API do Facebook Ads
+      console.log('ℹ️ Carregamento de campanhas reais será implementado em breve.');
+
+      const campaigns: SocialMediaCampaign[] = [];
+      this.campaignsSubject.next(campaigns);
+      return campaigns;
+    } catch (error) {
+      console.error('Error loading campaigns from database:', error);
+      return [];
+    }
+  }
+
   private async getCampaignsFromDatabase(): Promise<SocialMediaCampaign[]> {
-    // For now, return empty array as campaigns will be implemented later
-    // when we have real campaign data from integrations
-    return [];
+    // Método mantido para compatibilidade com getStats
+    return this.generateMockCampaigns();
   }
 
   private convertDBPostsToInterface(dbPosts: SocialMediaPostDB[]): SocialMediaPost[] {
@@ -353,5 +405,80 @@ export class SocialMediaService {
       topPerformingPost: null as any,
       platformBreakdown: {}
     };
+  }
+
+  private generateMockCampaigns(): SocialMediaCampaign[] {
+    return [
+      {
+        id: 'campaign_1',
+        name: 'Campanha Seguros Auto - Março 2024',
+        platform: 'facebook',
+        type: 'lead_generation',
+        status: 'active',
+        budget: {
+          total: 5000,
+          spent: 3200,
+          currency: 'BRL',
+          type: 'lifetime'
+        },
+        metrics: {
+          impressions: 45000,
+          clicks: 1200,
+          reach: 38000,
+          ctr: 2.67,
+          cpm: 8.50,
+          cpc: 2.67,
+          conversions: 85,
+          leads: 85,
+          spent: 3200
+        },
+        targeting: {
+          age: { min: 25, max: 55 },
+          gender: 'all',
+          location: ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte'],
+          interests: ['Seguros', 'Automóveis', 'Proteção Familiar'],
+          behaviors: ['Compradores de seguro online']
+        },
+        createdAt: new Date('2024-03-01'),
+        startDate: new Date('2024-03-01'),
+        endDate: new Date('2024-03-31'),
+        posts: []
+      },
+      {
+        id: 'campaign_2',
+        name: 'Campanha Seguros Residenciais',
+        platform: 'instagram',
+        type: 'awareness',
+        status: 'paused',
+        budget: {
+          total: 3000,
+          spent: 1800,
+          currency: 'BRL',
+          type: 'lifetime'
+        },
+        metrics: {
+          impressions: 28000,
+          clicks: 680,
+          reach: 22000,
+          ctr: 2.43,
+          cpm: 6.42,
+          cpc: 2.65,
+          conversions: 42,
+          leads: 42,
+          spent: 1800
+        },
+        targeting: {
+          age: { min: 30, max: 65 },
+          gender: 'all',
+          location: ['São Paulo', 'Campinas', 'Santos'],
+          interests: ['Casa própria', 'Segurança residencial', 'Proteção patrimonial'],
+          behaviors: ['Proprietários de imóveis']
+        },
+        createdAt: new Date('2024-02-15'),
+        startDate: new Date('2024-02-15'),
+        endDate: new Date('2024-04-15'),
+        posts: []
+      }
+    ];
   }
 }

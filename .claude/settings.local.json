@@ -20,7 +20,10 @@
       "Bash(taskkill:*)",
       "Bash(npm run lint)",
       "Bash(ionic serve:*)",
-      "Bash(npx ng serve:*)"
+      "Bash(npx ng serve:*)",
+      "Bash(netstat:*)",
+      "Bash(npm start:*)",
+      "Bash(ng lint:*)"
     ],
     "deny": [],
     "ask": []
